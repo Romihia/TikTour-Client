@@ -14,8 +14,8 @@ jobs:
           path: ~/project
       - node/install-packages:
           pkg-manager: npm
-      # - run:
-      #     command: npm install jest-junit
+      - run:
+          command: npm install jest-junit
       # - run:
       #     name: Run frontend tests
       #     command: npm test --ci --runInBand --reporters=default --reporters=jest-junit
