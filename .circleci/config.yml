@@ -24,7 +24,25 @@ jobs:
           command: npm run lint
       - store_test_results:
           path: ./test-results/
+
+
+    build-frontend:
+    executor: node/default
+    working_directory: ~/project/frontend
+    environment:
+      JEST_JUNIT_OUTPUT_DIR: ./build-results/
+    steps:
+      - checkout:
+          path: ~/project
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: deploy app
+          command: curl "https://api.render.com/deploy/srv-cqdomd0gph6c73aa4ddg?key=HCjL0_dIR1w"
 workflows:
-  build-and-test:
+  test:
     jobs:
-      - test-frontend
+      - test-frontend\
+  build:
+    jobs:
+      - build-frontend\
