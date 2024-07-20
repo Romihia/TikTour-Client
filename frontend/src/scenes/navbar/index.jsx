@@ -56,7 +56,7 @@ const Navbar = () => {
             },
           }}
         >
-          TikTourt
+          TikTour
         </Typography>
         {isNonMobileScreens && (
           <FlexBetween
