@@ -1,8 +1,8 @@
 import { Box, Typography, useTheme, useMediaQuery, Grid, Button } from "@mui/material";
 import Form from "./Form";
 import LoginImage from "./TiktourLogo.png"; 
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import ForgotPassword from "./ForgotPassword";  // Import the ForgotPassword component
+// import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+// import ForgotPassword from "./ForgotPassword";  // Import the ForgotPassword component
 
 const LoginPage = () => {
   const theme = useTheme();
