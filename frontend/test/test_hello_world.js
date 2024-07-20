@@ -1,7 +1,7 @@
 // src/components/HelloWorld.test.js
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import HelloWorld from './components/HelloWorld';
+import HelloWorld from '../src/components/HelloWorld';
 import '@testing-library/jest-dom';
 
 

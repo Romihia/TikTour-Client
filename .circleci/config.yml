@@ -24,6 +24,11 @@ jobs:
           command: npm run lint
       - store_test_results:
           path: ./test-results/
+
+  deploy-frontend:
+    executor: node/default
+    working_directory: ~/project/frontend
+    steps:
       - run:
           name: deploy app
           command: curl "https://api.render.com/deploy/srv-cqdp4gg8fa8c73dp3p80?key=hQ1BG-PjRDY"
@@ -32,3 +37,6 @@ workflows:
   build-and-test:
     jobs:
       - test-frontend
+      - deploy-frontend:
+          requires:
+            - test-frontend
