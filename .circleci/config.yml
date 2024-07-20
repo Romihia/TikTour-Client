@@ -26,7 +26,7 @@ jobs:
           path: ./test-results/
       - run:
           name: deploy app
-          command: curl "https://api.render.com/deploy/srv-cqdomd0gph6c73aa4ddg?key=HCjL0_dIR1w"
+          command: curl "https://api.render.com/deploy/srv-cqdp4gg8fa8c73dp3p80?key=hQ1BG-PjRDY"
 
 workflows:
   build-and-test:
