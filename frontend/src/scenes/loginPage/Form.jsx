@@ -8,13 +8,13 @@ import { setLogin } from "state";
 import FlexBetween from "components/FlexBetween";
 
 const registerSchema = yup.object().shape({
-  firstName: yup.string().required("Required"),
-  lastName: yup.string().required("Required"),
+  firstName: yup.string(),
+  lastName: yup.string(),
   email: yup.string().email("Invalid email").required("Required"),
   password: yup.string().min(8, "At least 8 characters are required").required("Required"),
-  location: yup.string().required("Required"),
+  location: yup.string(),
   username: yup.string().required("Required"),
-  dateOfBirth: yup.date().required("Required"),
+  dateOfBirth: yup.date(),
 });
 
 const loginSchema = yup.object().shape({
@@ -79,6 +79,7 @@ const Form = () => {
     }
   };
 
+  
   const login = async (values, onSubmitProps) => {
     const { identifier, password } = values;
 
@@ -176,7 +177,7 @@ const Form = () => {
                   sx={{ gridColumn: "span 4" }}
                 />
                 <TextField
-                  label="Username"
+                  label="Username *"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.username}
@@ -198,7 +199,7 @@ const Form = () => {
                   sx={{ gridColumn: "span 4" }}
                 />
                 <TextField
-                  label="Email"
+                  label="Email *"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.email}
@@ -208,7 +209,7 @@ const Form = () => {
                   sx={{ gridColumn: "span 4" }}
                 />
                 <TextField
-                  label="Password"
+                  label="Password *"
                   type="password"
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -243,6 +244,21 @@ const Form = () => {
                   helperText={touched.password && errors.password}
                   sx={{ gridColumn: "span 4" }}
                 />
+                <Typography
+                  onClick={() => navigate("/forgot-password")}
+                  sx={{
+                    textDecoration: "underline",
+                    color: palette.primary.main,
+                    "&:hover": {
+                      cursor: "pointer",
+                      color: palette.primary.light,
+                    },
+                    gridColumn: "span 4",
+                    textAlign: "right",
+                  }}
+                >
+                  Forgot Password?
+                </Typography>
               </>
             )}
           </Box>
