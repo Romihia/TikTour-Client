@@ -58,7 +58,7 @@ const Form = () => {
 
     try {
       const savedUserResponse = await fetch(
-        "http://localhost:3001/auth/register",
+        `${process.env.REACT_APP_URL_BACKEND}/auth/register`,
         {
           method: "POST",
           headers: {
@@ -83,7 +83,7 @@ const Form = () => {
     const { identifier, password } = values;
 
     try {
-      const loggedInResponse = await fetch("http://localhost:3001/auth/login", {
+      const loggedInResponse = await fetch(`${process.env.REACT_APP_URL_BACKEND}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

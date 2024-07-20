@@ -36,7 +36,7 @@ const PostWidget = ({
   const primary = palette.primary.main;
 
   const patchLike = async () => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
+    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -48,7 +48,7 @@ const PostWidget = ({
     dispatch(setPost({ post: updatedPost }));
   };
   const patchDisike = async () => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}/dislike`, {
+    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/dislike`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ const PostWidget = ({
           height="auto"
           alt="post"
           style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
-          src={`http://localhost:3001/assets/${picturePath}`}
+          src={`${process.env.REACT_APP_URL_BACKEND}/assets/${picturePath}`}
         />
       )}
       <FlexBetween mt="0.25rem">
