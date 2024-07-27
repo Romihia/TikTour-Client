@@ -11,6 +11,8 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import FollowersWidget from "./FollowersWidget";
+import FollowingWidget from "./FollowingWidget";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
@@ -32,7 +34,7 @@ const UserWidget = ({ userId, picturePath }) => {
 
   useEffect(() => {
     getUser();
-  }, []); 
+  }, [userId, token]);
 
   if (!user) {
     return null;
@@ -45,7 +47,6 @@ const UserWidget = ({ userId, picturePath }) => {
     rank,
     username,
     dateOfBirth,
-    friends,
   } = user;
 
   return (
@@ -72,7 +73,6 @@ const UserWidget = ({ userId, picturePath }) => {
             >
               {firstName} {lastName}
             </Typography>
-            <Typography color={medium}>{friends.length} friends</Typography>
           </Box>
         </FlexBetween>
         <ManageAccountsOutlined />
@@ -97,13 +97,13 @@ const UserWidget = ({ userId, picturePath }) => {
       {/* THIRD ROW */}
       <Box p="1rem 0">
         <FlexBetween mb="0.5rem">
-          <Typography color={medium}>birthday date</Typography>
+          <Typography color={medium}>Birthday Date</Typography>
           <Typography color={main} fontWeight="500">
             {dateOfBirth}
           </Typography>
         </FlexBetween>
         <FlexBetween>
-          <Typography color={medium}>User Name</Typography>
+          <Typography color={medium}>Username</Typography>
           <Typography color={main} fontWeight="500">
             {username}
           </Typography>
@@ -112,7 +112,13 @@ const UserWidget = ({ userId, picturePath }) => {
 
       <Divider />
 
-      {/* FOURTH ROW */}
+      {/* FOLLOWERS AND FOLLOWING WIDGETS */}
+      <FollowersWidget userId={userId} /> {/* Follower List Widget */}
+      <FollowingWidget userId={userId} /> {/* Following List Widget */}
+
+      <Divider />
+
+      {/* SOCIAL PROFILES */}
       <Box p="1rem 0">
         <Typography fontSize="1rem" color={main} fontWeight="500" mb="1rem">
           Social Profiles
