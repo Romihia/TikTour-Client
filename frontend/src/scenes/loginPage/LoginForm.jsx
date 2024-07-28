@@ -1,12 +1,12 @@
-// frontend/src/scenes/loginPage/LoginForm.jsx
-
 import { useState } from "react";
-import { Box, Button, TextField, Typography, useTheme } from "@mui/material";
+import { Box, Button, TextField, Typography, Checkbox, FormControlLabel, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "state";
+import Cookies from "js-cookie";
+import { checkToken } from "../../utils/checkToken";
 
 const loginSchema = yup.object().shape({
   identifier: yup.string().required("Required"),
@@ -16,6 +16,7 @@ const loginSchema = yup.object().shape({
 const initialValuesLogin = {
   identifier: "",
   password: "",
+  rememberMe: false,
 };
 
 const LoginForm = () => {
@@ -25,7 +26,7 @@ const LoginForm = () => {
   const [message, setMessage] = useState("");
 
   const login = async (values, onSubmitProps) => {
-    const { identifier, password } = values;
+    const { identifier, password, rememberMe } = values;
 
     try {
       console.log("POST /auth/login", { identifier, password });
@@ -44,6 +45,8 @@ const LoginForm = () => {
       onSubmitProps.resetForm();
 
       if (loggedIn) {
+        const options = rememberMe ? { expires: 7 } : {};
+        Cookies.set("token", loggedIn.token, options);
         dispatch(setLogin({ user: loggedIn.user, token: loggedIn.token }));
         navigate("/home");
       } else {
@@ -81,9 +84,21 @@ const LoginForm = () => {
               onChange={handleChange}
               value={values.password}
               name="password"
-              error={touched.password && errors.password}
+              error={touched.password && Boolean(errors.password)}
               helperText={touched.password && errors.password}
               sx={{ gridColumn: "span 4" }}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={values.rememberMe}
+                  onChange={handleChange}
+                  name="rememberMe"
+                  color="primary"
+                />
+              }
+              label="Remember Me"
+              sx={{ gridColumn: "span 2", textAlign: "left" }}
             />
             <Typography
               onClick={() => navigate("/forgot-password")}
@@ -94,7 +109,7 @@ const LoginForm = () => {
                   cursor: "pointer",
                   color: palette.primary.light,
                 },
-                gridColumn: "span 4",
+                gridColumn: "span 2",
                 textAlign: "right",
               }}
             >
@@ -135,6 +150,18 @@ const LoginForm = () => {
             >
               Don't have an account? Sign Up here.
             </Typography>
+            <Button
+              onClick={checkToken}
+              sx={{
+                m: "1rem 0",
+                p: "0.5rem",
+                backgroundColor: palette.primary.light,
+                color: palette.background.alt,
+                "&:hover": { color: palette.primary.main },
+              }}
+            >
+              Check Token
+            </Button>
           </Box>
         </form>
       )}
