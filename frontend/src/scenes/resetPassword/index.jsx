@@ -1,13 +1,10 @@
 import React from "react";
 import { Box, Grid, Typography, useTheme } from "@mui/material";
-import LoginForm from "./LoginForm";
+import ResetPassword from "./ResetPassword";
 import LoginImage from "../../TiktourLogo.png";
 
-
-const LoginPage = () => {
+const ResetPasswordPage = () => {
   const theme = useTheme();
-
-
   return (
     <Box>
       <Box
@@ -51,7 +48,7 @@ const LoginPage = () => {
             <Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
               Welcome to TikTour, the social media for tours and travel!
             </Typography>
-            <LoginForm />
+            <ResetPassword />
           </Box>
         </Grid>
       </Grid>
@@ -59,4 +56,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ResetPasswordPage;
