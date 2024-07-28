@@ -21,6 +21,10 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
 
   const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
   const toggleFollowing = async () => {
+    if (_id == userId){
+        return res.status(404).json({ message: "Cannot add yourself." });
+        console.log("asd");
+    }
     try {
       console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`);
             const response = await fetch(
