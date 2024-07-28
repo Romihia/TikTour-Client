@@ -6,7 +6,8 @@ import {
 } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
-import Friend from "components/Friend";
+import Followers from "components/Followers";
+import Following from "components/Following";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -62,8 +63,8 @@ const PostWidget = ({
 
   return (
     <WidgetWrapper m="2rem 0">
-      <Friend
-        friendId={postUserId}
+      <Following
+        userId={postUserId}
         name={name}
         subtitle={location}
         userPicturePath={userPicturePath}
@@ -90,7 +91,7 @@ const PostWidget = ({
             )}
           </IconButton>
           <Typography>{likeCount}</Typography>
-          
+
           <IconButton onClick={patchDisike}>
             {isDisLiked ? (
               <ThumbDownOutlined sx={{ color: primary }} />
