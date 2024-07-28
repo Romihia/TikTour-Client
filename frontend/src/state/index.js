@@ -5,8 +5,8 @@ const initialState = {
   user: null,
   token: null,
   posts: [],
-  followers: [],  // Added for managing followers
-  following: [],  // Added for managing following
+  followers: [],
+  following: [],
 };
 
 export const authSlice = createSlice({
@@ -42,8 +42,8 @@ export const authSlice = createSlice({
       }
     },
     setFollowing: (state, action) => {
-      if (action.payload.following.length > 0) {
-        state.following = action.payload.following;
+      if (state.user) {
+        state.user.following = action.payload.following;
       } else {
         console.error("Following list is empty");
       }

@@ -11,8 +11,8 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import FollowersWidget from "./FollowersWidget";
-import FollowingWidget from "./FollowingWidget";
+import FollowersListWidget from "./FollowersWidget";
+import FollowingListWidget from "./FollowingWidget";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
@@ -113,8 +113,8 @@ const UserWidget = ({ userId, picturePath }) => {
       <Divider />
 
       {/* FOLLOWERS AND FOLLOWING WIDGETS */}
-      <FollowersWidget userId={userId} /> {/* Follower List Widget */}
-      <FollowingWidget userId={userId} /> {/* Following List Widget */}
+      <FollowersListWidget userId={userId} /> {/* Follower List Widget */}
+      <FollowingListWidget userId={userId} /> {/* Following List Widget */}
 
       <Divider />
 

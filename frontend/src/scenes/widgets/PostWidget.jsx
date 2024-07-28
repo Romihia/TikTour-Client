@@ -63,8 +63,8 @@ const PostWidget = ({
 
   return (
     <WidgetWrapper m="2rem 0">
-      <Followers
-        FollowerId={postUserId}
+      <Following
+        userId={postUserId}
         name={name}
         subtitle={location}
         userPicturePath={userPicturePath}
@@ -91,7 +91,7 @@ const PostWidget = ({
             )}
           </IconButton>
           <Typography>{likeCount}</Typography>
-          
+
           <IconButton onClick={patchDisike}>
             {isDisLiked ? (
               <ThumbDownOutlined sx={{ color: primary }} />

@@ -6,12 +6,12 @@ import { setFollowing } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const Following = ({ followingId, name, subtitle, userPicturePath }) => {
+const Following = ({ userId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  const following = useSelector((state) => state.following || []);
+  const following = useSelector((state) => state.user.following || []);
 
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
@@ -19,22 +19,20 @@ const Following = ({ followingId, name, subtitle, userPicturePath }) => {
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
 
-  const isFollowing = Array.isArray(following) ? following.find((user) => user._id === followingId) : false;
-
+  const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
   const toggleFollowing = async () => {
     try {
-      const method = isFollowing ? "DELETE" : "POST";
-      console.log(`Sending ${method} request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/follow/${followingId}`);
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/follow/${followingId}`,
-        {
-          method,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`);
+            const response = await fetch(
+              `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`,
+              {
+                method: "PATCH",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+              },
+            }
+          );
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -55,7 +53,7 @@ const Following = ({ followingId, name, subtitle, userPicturePath }) => {
         <UserImage image={userPicturePath} size="55px" />
         <Box
           onClick={() => {
-            navigate(`/profile/${followingId}`);
+            navigate(`/profile/${userId}`);
             navigate(0);
           }}
         >

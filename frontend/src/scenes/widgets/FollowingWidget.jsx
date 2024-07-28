@@ -9,7 +9,7 @@ const FollowingListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
-  const following = useSelector((state) => state.following) || [];
+  const following = useSelector((state) => state.user.following) || [];
 
   const getFollowing = async () => {
     const response = await fetch(
@@ -42,7 +42,7 @@ const FollowingListWidget = ({ userId }) => {
           following.map((user) => (
             <Following
               key={user._id}
-              followingId={user._id}
+              userId={user._id}
               name={`${user.firstName} ${user.lastName}`}
               subtitle={user.rank}
               userPicturePath={user.picturePath}
