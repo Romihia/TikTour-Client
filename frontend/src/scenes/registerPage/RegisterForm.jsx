@@ -109,17 +109,15 @@ const RegisterForm = () => {
       if (savedUserResponse.ok) {
         setMessage("Registration successful. Please check your email for verification.");
         setOpenSnackbar(true);
-        setLoading(false);
-        //navigate("/login");
       }else {
         setMessage(savedUser.error || "Registration failed. Please try again.");
         setOpenSnackbar(true);
-        setLoading(false);
       }
     } catch (error) {
       console.error("Registration error:", error);
       setMessage("Registration failed. Please try again.");
       setOpenSnackbar(true);
+    }finally {
       setLoading(false);
     }
   };
