@@ -38,7 +38,8 @@ const LoginForm = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Username or password incorrect");
+        const errorData = await response.json();
+        throw new Error(errorData.msg || "Login failed");
       }
 
       const loggedIn = await response.json();
