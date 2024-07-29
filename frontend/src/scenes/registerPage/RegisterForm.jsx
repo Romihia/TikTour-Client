@@ -49,7 +49,7 @@ const RegisterForm = () => {
       console.log("POST ",url, formData);
 
       const savedUserResponse = await fetch(
-        `${process.env.REACT_APP_URL_BACKEND}/auth/register`,
+        url,
         {
           method: "POST",
           headers: {

@@ -151,18 +151,6 @@ const LoginForm = () => {
             >
               Don't have an account? Sign Up here.
             </Typography>
-            <Button
-              onClick={checkToken}
-              sx={{
-                m: "1rem 0",
-                p: "0.5rem",
-                backgroundColor: palette.primary.light,
-                color: palette.background.alt,
-                "&:hover": { color: palette.primary.main },
-              }}
-            >
-              Check Token
-            </Button>
           </Box>
         </form>
       )}
