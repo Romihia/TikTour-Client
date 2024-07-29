@@ -62,7 +62,7 @@ const ForgotPassword = () => {
             },
           }}
         >
-          Sign Up here.
+          Login here.
         </Typography>
       </form>
     </Box>

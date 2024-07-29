@@ -66,7 +66,7 @@ const ResetPassword = () => {
             },
           }}
         >
-          Sign Up here.
+          Login here.
         </Typography>
       </form>
     </Box>
