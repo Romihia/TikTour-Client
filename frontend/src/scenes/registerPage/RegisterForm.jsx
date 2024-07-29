@@ -1,16 +1,59 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Checkbox, FormControlLabel, Snackbar, Alert, useTheme } from "@mui/material";
+import { Box, Button, TextField, Typography, Checkbox, FormControlLabel, Snackbar, Alert,CircularProgress, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 
+const invalidChars = /[^A-Za-z\d!@#$%^&*]/g;
+
 const registerSchema = yup.object().shape({
-  firstName: yup.string(),
-  lastName: yup.string(),
-  email: yup.string().email("Invalid email").required("Required"),
-  password: yup.string().min(8, "At least 8 characters are required").required("Required"),
-  location: yup.string(),
-  username: yup.string().required("Required"),
+  firstName: yup
+    .string()
+    .matches(/^[A-Za-z]+$/, "First name must contain only English letters")
+    .min(1, "First name must be at least 1 character")
+    .max(50, "First name must be at most 50 characters"),
+  lastName: yup
+    .string()
+    .matches(/^[A-Za-z]+$/, "Last name must contain only English letters")
+    .min(1, "Last name must be at least 1 character")
+    .max(50, "Last name must be at most 50 characters"),
+  email: yup
+    .string()
+    .email("Invalid email")
+    .max(150, "Email must be at most 150 characters")
+    .required("Required"),
+  password: yup
+    .string()
+    .matches(/[A-Z]/, "At least one uppercase letter is required")
+    .matches(/[a-z]/, "At least one lowercase letter is required")
+    .matches(/\d/, "At least one number is required")
+    .min(8, "At least 8 characters are required")
+    .max(50, "Maximum 50 characters are allowed")
+    .test(
+      "invalid-characters",
+      "Password must meet the requirements and cannot contain invalid characters: ${invalidChars}",
+      function(value) {
+        if (!value) return true; // Skip validation if value is undefined
+        const invalidCharsFound = value.match(invalidChars);
+        if (invalidCharsFound) {
+          return this.createError({ message: `Password contains invalid characters: ${invalidCharsFound.join('')}` });
+        }
+        return true;
+      }
+    )
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,50}$/, "Password must meet the requirements:\nAt least one uppercase letter (A-Z).\nAt least one lowercase letter (a-z).\nAt least one number (0-9).\ncan have a special character !@#$%^&*")
+    .required("Required"),
+  location: yup
+    .string()
+    .matches(/^[A-Za-z]+$/, "Location must contain only English letters")
+    .min(1, "Location must be at least 1 character")
+    .max(50, "Location must be at most 50 characters"),
+  username: yup
+    .string()
+    .matches(/^[A-Za-z\d]+$/, "Username must contain only English letters or digits")
+    .min(1, "Username must be at least 1 character")
+    .max(50, "Username must be at most 50 characters")
+    .required("Required"),
   dateOfBirth: yup.date(),
   terms: yup.bool().oneOf([true], "You must accept the terms and conditions").required("Required"),
 });
@@ -31,6 +74,7 @@ const RegisterForm = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
 
   const register = async (values, onSubmitProps) => {
     const formData = {
@@ -44,9 +88,10 @@ const RegisterForm = () => {
     };
 
     try {
-      // Log the URL to verify it
+      
+      setLoading(true); // Start loading
       const url = `${process.env.REACT_APP_URL_BACKEND}/auth/register`;
-      console.log("POST ",url, formData);
+      console.log("POST ", url, formData);// Log the URL to verify it
 
       const savedUserResponse = await fetch(
         url,
@@ -61,20 +106,33 @@ const RegisterForm = () => {
       const savedUser = await savedUserResponse.json();
       onSubmitProps.resetForm();
 
-      if (savedUser) {
+      if (savedUserResponse.ok) {
         setMessage("Registration successful. Please check your email for verification.");
         setOpenSnackbar(true);
+        setLoading(false);
         //navigate("/login");
+      }else {
+        setMessage(savedUser.error || "Registration failed. Please try again.");
+        setOpenSnackbar(true);
+        setLoading(false);
       }
     } catch (error) {
       console.error("Registration error:", error);
       setMessage("Registration failed. Please try again.");
       setOpenSnackbar(true);
+      setLoading(false);
     }
   };
 
   const handleFormSubmit = async (values, onSubmitProps) => {
     await register(values, onSubmitProps);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   return (
@@ -106,7 +164,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 value={values.firstName}
                 name="firstName"
-                error={touched.firstName && errors.firstName}
+                error={touched.firstName && Boolean(errors.firstName)}
                 helperText={touched.firstName && errors.firstName}
                 sx={{ gridColumn: "span 2" }}
               />
@@ -116,7 +174,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 value={values.lastName}
                 name="lastName"
-                error={touched.lastName && errors.lastName}
+                error={touched.lastName && Boolean(errors.lastName)}
                 helperText={touched.lastName && errors.lastName}
                 sx={{ gridColumn: "span 2" }}
               />
@@ -126,7 +184,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 value={values.location}
                 name="location"
-                error={touched.location && errors.location}
+                error={touched.location && Boolean(errors.location)}
                 helperText={touched.location && errors.location}
                 sx={{ gridColumn: "span 4" }}
               />
@@ -136,7 +194,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 value={values.username}
                 name="username"
-                error={touched.username && errors.username}
+                error={touched.username && Boolean(errors.username)}
                 helperText={touched.username && errors.username}
                 sx={{ gridColumn: "span 4" }}
               />
@@ -148,7 +206,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 value={values.dateOfBirth}
                 name="dateOfBirth"
-                error={touched.dateOfBirth && errors.dateOfBirth}
+                error={touched.dateOfBirth && Boolean(errors.dateOfBirth)}
                 helperText={touched.dateOfBirth && errors.dateOfBirth}
                 sx={{ gridColumn: "span 4" }}
               />
@@ -158,7 +216,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 value={values.email}
                 name="email"
-                error={touched.email && errors.email}
+                error={touched.email && Boolean(errors.email)}
                 helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 4" }}
               />
@@ -169,7 +227,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 value={values.password}
                 name="password"
-                error={touched.password && errors.password}
+                error={touched.password && Boolean(errors.password)}
                 helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 4" }}
               />
@@ -195,6 +253,11 @@ const RegisterForm = () => {
               <Typography color="primary" sx={{ mt: "1rem", textAlign: "center" }}>
                 {message}
               </Typography>
+            )}
+            {loading && (
+              <Box display="flex" justifyContent="center" sx={{ mt: "1rem" }}>
+                <CircularProgress />
+              </Box>
             )}
             <Box>
               <Button
@@ -234,9 +297,9 @@ const RegisterForm = () => {
       <Snackbar
         open={openSnackbar}
         autoHideDuration={10000}
-        onClose={() => setOpenSnackbar(false)}
+        onClose={handleSnackbarClose}
       >
-        <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
           {message}
         </Alert>
       </Snackbar>
