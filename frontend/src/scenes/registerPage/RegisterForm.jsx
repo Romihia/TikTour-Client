@@ -39,7 +39,7 @@ const RegisterForm = () => {
       password: values.password,
       location: values.location,
       username: values.username,
-      dateOfBirth: values.dateOfBirth,
+      dateOfBirth: values.dateOfBirth
     };
 
     try {
