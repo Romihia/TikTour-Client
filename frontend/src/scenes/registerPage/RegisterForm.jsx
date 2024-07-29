@@ -32,6 +32,8 @@ const RegisterForm = () => {
   const [message, setMessage] = useState("");
 
   const register = async (values, onSubmitProps) => {
+    console.log(values);
+    console.log("dateOfBirth: ", values.dateOfBirth);
     const formData = {
       firstName: values.firstName,
       lastName: values.lastName,
@@ -39,7 +41,7 @@ const RegisterForm = () => {
       password: values.password,
       location: values.location,
       username: values.username,
-      dateOfBirth: values.dateOfBirth,
+      dateOfBirth: values.dateOfBirth
     };
 
     try {

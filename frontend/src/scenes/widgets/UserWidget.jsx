@@ -11,6 +11,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { date } from "yup";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
@@ -47,6 +48,8 @@ const UserWidget = ({ userId, picturePath }) => {
     dateOfBirth,
   } = user;
 
+  const fixedBirthdayDate = dateOfBirth.slice(0,10);
+  
   return (
     <WidgetWrapper>
       {/* FIRST ROW */}
@@ -97,7 +100,7 @@ const UserWidget = ({ userId, picturePath }) => {
         <FlexBetween mb="0.5rem">
           <Typography color={medium}>Birthday Date</Typography>
           <Typography color={main} fontWeight="500">
-            {dateOfBirth}
+            {fixedBirthdayDate}
           </Typography>
         </FlexBetween>
         <FlexBetween>
