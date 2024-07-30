@@ -65,12 +65,12 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   return (
     <>
-      <ul style={{ display: 'flex', flexDirection: 'column-reverse' }}>
       {posts.map(
         ({
           _id,
           userId,
-          userName,
+          firstName,
+          lastName,
           description,
           location,
           picturePath,
@@ -82,7 +82,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             key={_id}
             postId={_id}
             postUserId={userId}
-            name={userName}
+            name={`${firstName} ${lastName}`}
             description={description}
             location={location}
             picturePath={picturePath}
@@ -94,7 +94,6 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           />
         )
       )}
-    </ul>
     </>
   );
 };

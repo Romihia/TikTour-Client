@@ -2,16 +2,16 @@ import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setFollowing } from "state";
+import { setFriends } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const Following = ({ userId, name, subtitle, userPicturePath }) => {
+const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  const following = useSelector((state) => state.user.following || []);
+  const friends = useSelector((state) => state.user.friends || []);
 
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
@@ -19,24 +19,21 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
 
-  const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
-  const toggleFollowing = async () => {
-    if (_id === userId){
-        console.error('Cant add myself.');
-        return;
-    }
+  const isFriend = Array.isArray(friends) ? friends.find((friend) => friend._id === friendId) : false;
+
+  const patchFriend = async () => {
     try {
-      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`);
-            const response = await fetch(
-              `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`,
-              {
-                method: "PATCH",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-              },
-            }
-          );
+      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${friendId}`);
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${friendId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -45,9 +42,9 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
       const data = await response.json();
       console.log('Response data:', data);
 
-      dispatch(setFollowing({ following: data }));
+      dispatch(setFriends({ friends: data }));
     } catch (error) {
-      console.error('Error during toggleFollowing:', error);
+      console.error('Error during patchFriend:', error);
     }
   };
 
@@ -57,7 +54,7 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
         <UserImage image={userPicturePath} size="55px" />
         <Box
           onClick={() => {
-            navigate(`/profile/${userId}`);
+            navigate(`/profile/${friendId}`);
             navigate(0);
           }}
         >
@@ -80,10 +77,10 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
         </Box>
       </FlexBetween>
       <IconButton
-        onClick={toggleFollowing}
+        onClick={patchFriend}
         sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
       >
-        {isFollowing ? (
+        {isFriend ? (
           <PersonRemoveOutlined sx={{ color: primaryDark }} />
         ) : (
           <PersonAddOutlined sx={{ color: primaryDark }} />
@@ -93,4 +90,4 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
   );
 };
 
-export default Following;
+export default Friend;

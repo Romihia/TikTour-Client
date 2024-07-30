@@ -24,9 +24,6 @@ jobs:
           command: npm run lint
       - store_test_results:
           path: ./test-results/
-      - run:
-          name: deploy app - stage
-          command: curl "https://api.render.com/deploy/srv-cqelblggph6c73as6pn0?key=R-Bn3VmmFIk"
 
   deploy-frontend:
     executor: node/default
@@ -46,4 +43,5 @@ workflows:
             - test-frontend
           filters:
             branches:
-              only: production
+              only: production 
+              

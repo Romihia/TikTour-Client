@@ -1,12 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import HomePage from "scenes/homePage";
 import LoginPage from "scenes/loginPage";
-import RegisterPage from "scenes/registerPage";
 import ProfilePage from "scenes/profilePage";
 import AboutPage from "scenes/about";
-import ForgotPassword from "scenes/forgotPassword";
-import ResetPassword from "scenes/resetPassword";
-import VerifyEmail from './scenes/verifyUser/VerifyEmail';
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -24,42 +20,16 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Routes>
-            <Route 
-              path="/" 
-              element={<LoginPage />} 
-              />
-            <Route 
-              path="/login"  
-              element={<LoginPage />} 
-              />
-            <Route 
-              path="/register" 
-              element={<RegisterPage />} 
-              />
-            <Route 
-              path="/home" 
-              element={isAuth ? <HomePage /> : <Navigate to="/" />} 
-              />
-            <Route 
-              path="/profile/:userId" 
-              element={isAuth ? <ProfilePage /> : <Navigate to="/" />} 
+            <Route path="/" element={<LoginPage />} />
+            <Route
+              path="/home"
+              element={isAuth ? <HomePage /> : <Navigate to="/" />}
             />
-            <Route 
-              path="/about"
-              element={isAuth ? <AboutPage />: <Navigate to="/" />} 
+            <Route
+              path="/profile/:userId"
+              element={isAuth ? <ProfilePage /> : <Navigate to="/" />}
             />
-            <Route 
-              path="/forgot-password" 
-              element={<ForgotPassword />} 
-              />
-            <Route 
-              path="/reset-password" 
-              element={<ResetPassword />} 
-              />
-            <Route 
-              path="/verify-email" 
-              element={<VerifyEmail  />} 
-              />
+            <Route path="/about" element={<AboutPage />} />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>

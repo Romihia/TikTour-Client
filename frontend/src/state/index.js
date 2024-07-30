@@ -5,8 +5,6 @@ const initialState = {
   user: null,
   token: null,
   posts: [],
-  followers: [],
-  following: [],
 };
 
 export const authSlice = createSlice({
@@ -24,6 +22,13 @@ export const authSlice = createSlice({
       state.user = null;
       state.token = null;
     },
+    setFriends: (state, action) => {
+      if (state.user) {
+        state.user.friends = action.payload.friends;
+      } else {
+        console.error("user friends non-existent :(");
+      }
+    },
     setPosts: (state, action) => {
       state.posts = action.payload.posts;
     },
@@ -34,31 +39,9 @@ export const authSlice = createSlice({
       });
       state.posts = updatedPosts;
     },
-    setFollowers: (state, action) => {
-      if (action.payload.followers.length > 0) {
-        state.followers = action.payload.followers;
-      } else {
-        console.error("Followers list is empty");
-      }
-    },
-    setFollowing: (state, action) => {
-      if (state.user) {
-        state.user.following = action.payload.following;
-      } else {
-        console.error("Following list is empty");
-      }
-    },
   },
 });
 
-export const {
-  setMode,
-  setLogin,
-  setLogout,
-  setPosts,
-  setPost,
-  setFollowers,
-  setFollowing
-} = authSlice.actions;
-
+export const { setMode, setLogin, setLogout, setFriends, setPosts, setPost } =
+  authSlice.actions;
 export default authSlice.reducer;

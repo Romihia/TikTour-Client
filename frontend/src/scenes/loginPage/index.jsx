@@ -1,12 +1,12 @@
-import React from "react";
-import { Box, Grid, Typography, useTheme } from "@mui/material";
-import LoginForm from "./LoginForm";
-import LoginImage from "../../TiktourLogo.png";
-
+import { Box, Typography, useTheme, useMediaQuery, Grid, Button } from "@mui/material";
+import Form from "./Form";
+import LoginImage from "./TiktourLogo.png"; 
+// import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+// import ForgotPassword from "./ForgotPassword";  // Import the ForgotPassword component
 
 const LoginPage = () => {
   const theme = useTheme();
-
+  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   return (
     <Box>
@@ -49,9 +49,10 @@ const LoginPage = () => {
             style={{ height: '100%' }}
           >
             <Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
-              Welcome to TikTour, the social media for tours and travel!
+              Welcome to TikTour, the social media for tours and travel ! 
             </Typography>
-            <LoginForm />
+            <Form />
+
           </Box>
         </Grid>
       </Grid>

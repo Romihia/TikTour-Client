@@ -1,31 +1,31 @@
 import { Box, Typography, useTheme } from "@mui/material";
-import Following from "components/Following";
+import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFollowing } from "state";
+import { setFriends } from "state";
 
-const FollowingListWidget = ({ userId }) => {
+const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
-  const following = useSelector((state) => state.user.following) || [];
+  const friends = useSelector((state) => state.user.friends) || [];
 
-  const getFollowing = async () => {
+  const getFriends = async () => {
     const response = await fetch(
-      `${process.env.REACT_APP_URL_BACKEND}/users/${userId}/following`,
+      `${process.env.REACT_APP_URL_BACKEND}/users/${userId}/friends`,
       {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       }
     );
     const data = await response.json();
-    dispatch(setFollowing({ following: data }));
+    dispatch(setFriends({ friends: data }));
   };
 
   useEffect(() => {
-    getFollowing();
-  }, [userId, token, dispatch]);
+    getFriends();
+  }, []); 
 
   return (
     <WidgetWrapper>
@@ -35,22 +35,22 @@ const FollowingListWidget = ({ userId }) => {
         fontWeight="500"
         sx={{ mb: "1.5rem" }}
       >
-        Following List
+        Friend List
       </Typography>
       <Box display="flex" flexDirection="column" gap="1.5rem">
-        {following.length > 0 ? (
-          following.map((user) => (
-            <Following
-              key={user._id}
-              userId={user._id}
-              name={`${user.firstName} ${user.lastName}`}
-              subtitle={user.rank}
-              userPicturePath={user.picturePath}
+        {friends.length > 0 ? (
+          friends.map((friend) => (
+            <Friend
+              key={friend._id}
+              friendId={friend._id}
+              name={`${friend.firstName} ${friend.lastName}`}
+              subtitle={friend.rank}
+              userPicturePath={friend.picturePath}
             />
           ))
         ) : (
           <Typography variant="h6" color={palette.neutral.medium}>
-            Not following anyone.
+            No friends found.
           </Typography>
         )}
       </Box>
@@ -58,4 +58,4 @@ const FollowingListWidget = ({ userId }) => {
   );
 };
 
-export default FollowingListWidget;
+export default FriendListWidget;

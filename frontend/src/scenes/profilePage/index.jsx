@@ -3,13 +3,10 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Navbar from "scenes/navbar";
-import FollowersWidget from "scenes/widgets/FollowersWidget";
-import FollowingWidget from "scenes/widgets/FollowingWidget";
+import FriendListWidget from "scenes/widgets/FriendListWidget";
 import MyPostWidget from "scenes/widgets/MyPostWidget";
 import PostsWidget from "scenes/widgets/PostsWidget";
 import UserWidget from "scenes/widgets/UserWidget";
-import TotalLikesWidget from "scenes/widgets/TotalLikesWidget"; // New widget
-import TopLikerWidget from "scenes/widgets/TopLikerWidget"; // New widget
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -28,8 +25,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     getUser();
-  }, []);
-
+  }, []); 
   if (!user) return null;
 
   return (
@@ -45,13 +41,7 @@ const ProfilePage = () => {
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />
           <Box m="2rem 0" />
-          <FollowersWidget userId={userId} />
-          <Box m="2rem 0" />
-          <FollowingWidget userId={userId} />
-          <Box m="2rem 0" />
-          <TotalLikesWidget userId={userId} /> 
-          <Box m="2rem 0" />
-          <TopLikerWidget userId={userId} /> 
+          <FriendListWidget userId={userId} />
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
