@@ -3,6 +3,7 @@ import {
   FavoriteOutlined,
   ShareOutlined,
   ThumbDownOutlined,
+  DeleteOutline,
 } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
@@ -60,7 +61,23 @@ const PostWidget = ({
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
-
+  const deletePost = async () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        dispatch(setPost({ post: await response.json() }));
+        alert("Post deleted successfully");
+      } else {
+        alert("Failed to delete post");
+      }
+    }
+  };
   return (
     <WidgetWrapper m="2rem 0">
       <Following
@@ -100,6 +117,16 @@ const PostWidget = ({
             )}
           </IconButton>
           <Typography>{disLikeCount}</Typography>
+        </FlexBetween>
+        <FlexBetween gap="1rem">
+          <IconButton>
+            <ShareOutlined />
+          </IconButton>
+          {loggedInUserId === postUserId && (
+            <IconButton onClick={deletePost}>
+              <DeleteOutline sx={{ color: primary }} />
+            </IconButton>
+          )}
         </FlexBetween>
         <IconButton>
           <ShareOutlined />
