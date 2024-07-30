@@ -47,9 +47,10 @@ const UserWidget = ({ userId, picturePath }) => {
     username,
     dateOfBirth,
   } = user;
-
-  const fixedBirthdayDate = dateOfBirth.slice(0,10);
   
+  const fixedBirthdayDate = dateOfBirth === null ? "No birthday given" : dateOfBirth.slice(0,10);
+
+
   return (
     <WidgetWrapper>
       {/* FIRST ROW */}
@@ -72,7 +73,7 @@ const UserWidget = ({ userId, picturePath }) => {
                 },
               }}
             >
-              {firstName} {lastName}
+              {firstName=== null ? "firstName" : firstName} {lastName === null ? "lastName" : lastName}
             </Typography>
           </Box>
         </FlexBetween>
