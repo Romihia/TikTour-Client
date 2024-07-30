@@ -72,8 +72,8 @@ const PostWidget = ({
       });
       if (response.ok) {
         dispatch(setPost({ post: await response.json() }));
-        alert("Post deleted successfully");
         window.location.reload();
+        alert("Post deleted successfully");
       } else {
         alert("Failed to delete post");
       }

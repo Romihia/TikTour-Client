@@ -71,17 +71,30 @@ const MyPostWidget = ({ picturePath }) => {
     <WidgetWrapper>
       <FlexBetween gap="1.5rem">
         <UserImage image={picturePath} />
-        <InputBase
-          placeholder="What's on your mind..."
-          onChange={(e) => setPost(e.target.value)}
-          value={post}
+        <FlexBetween
           sx={{
-            width: "100%",
-            backgroundColor: palette.neutral.light,
-            borderRadius: "2rem",
-            padding: "1rem 2rem",
+            flexDirection: 'column', // Arrange children in a column
+            alignItems: 'flex-start', // Align children to start of the cross-axis (horizontal alignment)
+            width: '100%' // Ensure the container takes full width
           }}
-        />
+        >
+          <b style={ {color: mediumMain}}>       
+            <span style={{ color: 'red' }}>* </span>
+            Description
+          </b>
+          <InputBase
+            placeholder="What's on your mind..."
+            onChange={(e) => setPost(e.target.value)}
+            value={post}
+            sx={{
+              width: "100%", // Full width of the container
+              backgroundColor: palette.neutral.light,
+              borderRadius: "2rem",
+              padding: "1rem 2rem",
+              marginTop: "0.5rem" // Add some spacing between the label and the input
+            }}
+          />
+    </FlexBetween>
       </FlexBetween>
       {isImage && (
         <Box
@@ -162,7 +175,10 @@ const MyPostWidget = ({ picturePath }) => {
             color={mediumMain}
             sx={{ "&:hover": { cursor: "pointer", color: medium } }}
           >
+            <b>       
+            <span style={{ color: 'red' }}>* </span>
             Location
+          </b>
           </Typography>
         </FlexBetween>
 
