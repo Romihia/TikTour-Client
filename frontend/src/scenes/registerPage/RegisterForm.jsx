@@ -74,6 +74,7 @@ const RegisterForm = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Updated state
   const [loading, setLoading] = useState(false); // Loading state
 
   const register = async (values, onSubmitProps) => {
@@ -104,18 +105,22 @@ const RegisterForm = () => {
         }
       );
       const savedUser = await savedUserResponse.json();
+      console.log(`${savedUser}`);
       onSubmitProps.resetForm();
 
       if (savedUserResponse.ok) {
         setMessage("Registration successful. Please check your email for verification.");
+        setSnackbarSeverity('success');
         setOpenSnackbar(true);
       }else {
         setMessage(savedUser.error || "Registration failed. Please try again.");
+        setSnackbarSeverity('error');
         setOpenSnackbar(true);
       }
     } catch (error) {
       console.error("Registration error:", error);
       setMessage("Registration failed. Please try again.");
+      setSnackbarSeverity('error');
       setOpenSnackbar(true);
     }finally {
       setLoading(false);
@@ -297,7 +302,7 @@ const RegisterForm = () => {
         autoHideDuration={10000}
         onClose={handleSnackbarClose}
       >
-        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {message}
         </Alert>
       </Snackbar>
