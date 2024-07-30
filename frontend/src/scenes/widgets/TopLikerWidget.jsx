@@ -1,18 +1,18 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux"; // Import useSelector
+import { useSelector } from "react-redux";
 
 const TopLikerWidget = ({ userId }) => {
   const [topLiker, setTopLiker] = useState(null);
-  const token = useSelector((state) => state.token); // Get token from state
+  const token = useSelector((state) => state.token);
   const { palette } = useTheme();
 
   const getTopLiker = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${userId}/topLiker`, {
         method: "GET",
-        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
       setTopLiker(data.topLiker);
@@ -23,7 +23,7 @@ const TopLikerWidget = ({ userId }) => {
 
   useEffect(() => {
     getTopLiker();
-  }, [userId, token]); // Include token in dependency array
+  }, [userId, token]);
 
   return (
     <WidgetWrapper>
@@ -33,7 +33,14 @@ const TopLikerWidget = ({ userId }) => {
       {topLiker ? (
         <Box>
           <Typography variant="h6" color={palette.neutral.medium}>
-            {topLiker.username} with {topLiker.likeCount} Likes
+            <a
+              href={topLiker._id ? `${process.env.REACT_APP_URL_FRONTEND}/profile/${topLiker._id}` : '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none', color: palette.primary.main }}
+            >
+              {topLiker.username}
+            </a>
           </Typography>
         </Box>
       ) : (
