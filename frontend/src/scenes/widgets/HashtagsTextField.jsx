@@ -1,18 +1,16 @@
-import { light } from '@mui/material/styles/createPalette';
 import React, { useState } from 'react';
 
-const LocationAutocomplete = ({ onSelectLocation }) => {
-  const [selectedLocation, setSelectedLocation] = useState("");
+const HashtagsTextField = ({ onSavingHashtag }) => {
+  const [selectedHashtag, setSelectedHashtag] = useState("#");
 
   const handleChange = (event) => {
     const inputValue = event.target.value;
-    setSelectedLocation(inputValue);
+    setSelectedHashtag(inputValue);
   };
 
   const handleSave = () => {
-    onSelectLocation(selectedLocation); // Pass the selectedLocation to the parent component
+    onSavingHashtag(selectedHashtag); // Pass the selectedHashtag to the parent component
   };
-
 
   const buttonStyle = {
     cursor: 'pointer',
@@ -31,6 +29,7 @@ const LocationAutocomplete = ({ onSelectLocation }) => {
     borderWidth: '0.5px'
     };
 
+
   return (
     <div style= {{
       margin: '5px',
@@ -38,19 +37,18 @@ const LocationAutocomplete = ({ onSelectLocation }) => {
       }}>
       <input
         type="text"
-        placeholder="Enter a location"
-        value={selectedLocation} // Bind the input value to state
+        placeholder="Enter a Hashtag"
+        value={selectedHashtag} // Bind the input value to state
         onChange={handleChange} // Use handleChange to update state
-        style={ inputStyle }
+        style={inputStyle}
       />
-      <button  
-      style={buttonStyle}
-      onClick={handleSave}
+      <button style={ buttonStyle }
+        onClick={handleSave}
       >
-        Save Location
+        Save Hashtag
       </button>
     </div>
   );
 };
 
-export default LocationAutocomplete;
+export default HashtagsTextField;
