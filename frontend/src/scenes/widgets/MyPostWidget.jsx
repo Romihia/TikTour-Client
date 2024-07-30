@@ -75,6 +75,7 @@ const MyPostWidget = ({ picturePath }) => {
     setAddedLocation(false);
     setHashtagsList([]); // Clear the hashtags list
     alert("The post was posted successfully!");
+    
   };
 
   return (
