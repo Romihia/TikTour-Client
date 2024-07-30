@@ -3,10 +3,12 @@ import {
   FavoriteOutlined,
   ShareOutlined,
   ThumbDownOutlined,
+  DeleteOutline,
 } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
-import Friend from "components/Friend";
+import Followers from "components/Followers";
+import Following from "components/Following";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -59,11 +61,28 @@ const PostWidget = ({
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
-
+  const deletePost = async () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        dispatch(setPost({ post: await response.json() }));
+        window.location.reload();
+        alert("Post deleted successfully");
+      } else {
+        alert("Failed to delete post");
+      }
+    }
+  };
   return (
     <WidgetWrapper m="2rem 0">
-      <Friend
-        friendId={postUserId}
+      <Following
+        userId={postUserId}
         name={name}
         subtitle={location}
         userPicturePath={userPicturePath}
@@ -90,7 +109,7 @@ const PostWidget = ({
             )}
           </IconButton>
           <Typography>{likeCount}</Typography>
-          
+
           <IconButton onClick={patchDisike}>
             {isDisLiked ? (
               <ThumbDownOutlined sx={{ color: primary }} />
@@ -99,6 +118,14 @@ const PostWidget = ({
             )}
           </IconButton>
           <Typography>{disLikeCount}</Typography>
+        </FlexBetween>
+        <FlexBetween gap="1rem">
+          
+          {loggedInUserId === postUserId && (
+            <IconButton onClick={deletePost}>
+              <DeleteOutline sx={{ color: primary }} />
+            </IconButton>
+          )}
         </FlexBetween>
         <IconButton>
           <ShareOutlined />
