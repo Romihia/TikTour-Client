@@ -6,12 +6,12 @@ import ProfilePage from "scenes/profilePage";
 import AboutPage from "scenes/about";
 import ForgotPassword from "scenes/forgotPassword";
 import ResetPassword from "scenes/resetPassword";
+import VerifyEmail from './scenes/verifyUser/VerifyEmail';
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
-
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -55,6 +55,10 @@ function App() {
             <Route 
               path="/reset-password" 
               element={<ResetPassword />} 
+              />
+            <Route 
+              path="/verify-email" 
+              element={<VerifyEmail  />} 
               />
           </Routes>
         </ThemeProvider>
