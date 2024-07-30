@@ -63,6 +63,7 @@ const MyPostWidget = ({ picturePath }) => {
     setImage(null);
     setPost("");
     setLocation(""); // Reset location after posting
+    setAddedLocation(false);
 
     alert("The post was posted successfully!");
   };
@@ -78,7 +79,7 @@ const MyPostWidget = ({ picturePath }) => {
             width: '100%' // Ensure the container takes full width
           }}
         >
-          <b style={ {color: mediumMain}}>       
+          <b style={{ color: mediumMain }}>       
             <span style={{ color: 'red' }}>* </span>
             Description
           </b>
@@ -94,7 +95,7 @@ const MyPostWidget = ({ picturePath }) => {
               marginTop: "0.5rem" // Add some spacing between the label and the input
             }}
           />
-    </FlexBetween>
+        </FlexBetween>
       </FlexBetween>
       {isImage && (
         <Box
@@ -141,7 +142,29 @@ const MyPostWidget = ({ picturePath }) => {
         </Box>
       )}
       <Box>
-        {addedLocation && <p>{location}</p>}
+        {addedLocation && (
+          <Box mt="1rem">
+            <Typography
+              variant="h6"
+              sx={{
+                color: palette.primary.main,
+                fontWeight: 'bold',
+                display: 'inline' // Keep "Location:" and the input on the same line
+              }}
+            >
+              Location:
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                marginLeft: '0.5rem', // Add some space between "Location:" and the input
+                display: 'inline' // Keep "Location:" and the input on the same line
+              }}
+            >
+              {location}
+            </Typography>
+          </Box>
+        )}
         {showLocationAutocomplete && (
           <LocationAutocomplete
             onSelectLocation={(selectedLocation) => {
