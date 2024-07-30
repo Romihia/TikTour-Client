@@ -8,7 +8,7 @@ import {
   MicOutlined,
   MoreHorizOutlined,
   LocationOnOutlined,
-  TagOutlined
+  TagOutlined,
 } from "@mui/icons-material";
 import {
   Box,
@@ -24,7 +24,6 @@ import FlexBetween from "components/FlexBetween";
 import Dropzone from "react-dropzone";
 import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
-
 import LocationAutocomplete from "./LocationAutocomplete";
 import HashtagsTextField from "./HashtagsTextField";
 
@@ -35,7 +34,7 @@ const MyPostWidget = ({ picturePath }) => {
   const [hashtagsList, setHashtagsList] = useState([]);
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
-  let [location, setLocation] = useState(""); // Location state
+  const [location, setLocation] = useState(""); // Location state
   const [addedLocation, setAddedLocation] = useState(false);
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
@@ -51,9 +50,12 @@ const MyPostWidget = ({ picturePath }) => {
 
   const handlePost = async () => {
     const formData = new FormData();
+    let hashtagsSuffix = " ";
+    hashtagsList.forEach((hashtag) => { hashtagsSuffix += '#' + hashtag + ' '; });
     formData.append("userId", _id);
-    formData.append("description", post);
+    formData.append("description", post + hashtagsSuffix);
     formData.append("location", location); // Add location to formData
+    formData.append("hashtags", hashtagsList.join(',')); // Join hashtags with a delimiter
 
     if (image) {
       formData.append("picture", image);
@@ -70,7 +72,8 @@ const MyPostWidget = ({ picturePath }) => {
     setImage(null);
     setPost("");
     setLocation(""); // Reset location after posting
-
+    setAddedLocation(false);
+    setHashtagsList([]); // Clear the hashtags list
     alert("The post was posted successfully!");
   };
 
@@ -85,7 +88,7 @@ const MyPostWidget = ({ picturePath }) => {
             width: '100%' // Ensure the container takes full width
           }}
         >
-          <b style={ {color: mediumMain}}>       
+          <b style={{ color: mediumMain }}>
             <span style={{ color: 'red' }}>* </span>
             Description
           </b>
@@ -101,7 +104,7 @@ const MyPostWidget = ({ picturePath }) => {
               marginTop: "0.5rem" // Add some spacing between the label and the input
             }}
           />
-    </FlexBetween>
+        </FlexBetween>
       </FlexBetween>
       {isImage && (
         <Box
@@ -147,15 +150,27 @@ const MyPostWidget = ({ picturePath }) => {
           </Dropzone>
         </Box>
       )}
-      
+
       <Box>
-        {addedLocation && <p>{location}</p>}
+        {addedLocation &&
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0.5rem',
+          borderRadius: '5px',
+          fontWeight: 'bold',
+          width: 'fit-content'
+        }}>
+          <LocationOnOutlined />
+          <p style={{ color: 'red', marginRight: '5px' }}>Location: </p>
+          <p>{location}</p>
+        </div>
+        }
         {showLocationAutocomplete && (
           <LocationAutocomplete
             onSelectLocation={(selectedLocation) => {
               setLocation(selectedLocation);
               setShowLocationAutocomplete(false); // Hide autocomplete after selection
-              location = selectedLocation;
               setAddedLocation(true);
             }}
           />
@@ -164,30 +179,18 @@ const MyPostWidget = ({ picturePath }) => {
 
       <Box>
         {showHashtagsTextField && (
-            <HashtagsTextField
-              onSavingHashtag= {(hashtag) => {
-                let updatedList = hashtagsList;
-                updatedList.push(hashtag); 
-                setHashtagsList(updatedList);
-                console.log("New list: " + updatedList);
-                console.log("Hashtag list: " + hashtagsList);
-
-              }}
-            />
-          )
-          }
+          <HashtagsTextField
+            setHashtags={setHashtagsList}
+            hashtags={hashtagsList}
+            onSavingHashtag={(hashtag) => {
+              const updatedList = [...hashtagsList];
+              updatedList.push(hashtag);
+              setHashtagsList(updatedList);
+            }}
+          />
+        )}
       </Box>
 
-      <div>
-        <span>Hashtags: </span>
-        {hashtagsList.length > 0 && (
-          <ul>
-            {hashtagsList.map((hashtag, index) => (
-              <li key={index}>{hashtag}</li>
-            ))}
-          </ul>
-        )}
-      </div>
       <Divider sx={{ margin: "1.25rem 0" }} />
 
       <FlexBetween>
@@ -209,27 +212,26 @@ const MyPostWidget = ({ picturePath }) => {
             color={mediumMain}
             sx={{ "&:hover": { cursor: "pointer", color: medium } }}
           >
-            <b>       
-            <span style={{ color: 'red' }}>* </span>
-            Location
-          </b>
+            <b>
+              <span style={{ color: 'red' }}>* </span>
+              Location
+            </b>
           </Typography>
         </FlexBetween>
 
         <FlexBetween gap="0.25rem" onClick={() => {
-            setShowHashtagsTextField(!showHashtagsTextField);
-          }}>
-            <TagOutlined sx={{ color: mediumMain }} />
-            <Typography
-              color={mediumMain}
-              sx={{ "&:hover": { cursor: "pointer", color: medium } }}
-            >
-              <b>       
-                Hashtags
-              </b>
-            </Typography>
-      </FlexBetween>
-
+          setShowHashtagsTextField(!showHashtagsTextField);
+        }}>
+          <TagOutlined sx={{ color: mediumMain }} />
+          <Typography
+            color={mediumMain}
+            sx={{ "&:hover": { cursor: "pointer", color: medium } }}
+          >
+            <b>
+              Hashtags
+            </b>
+          </Typography>
+        </FlexBetween>
 
         <Button
           disabled={!post || !addedLocation}
