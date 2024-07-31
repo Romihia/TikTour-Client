@@ -1,31 +1,35 @@
-import { PersonRemoveOutlined } from "@mui/icons-material";
+import { PersonRemoveOutlined, PersonAddOutlined } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setFollowers } from "state";
+import { setFollowing,setFollowers } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const Followers = ({ followerId, name, subtitle, userPicturePath }) => {
+const Followers = ({ userId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const followers = useSelector((state) => state.followers || []);
-
+  const following = useSelector((state) => state.user.following || []);
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
 
-  const isFollower = Array.isArray(followers) ? followers.find((follower) => follower._id === followerId) : false;
+  const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
 
-  const removeFollower = async () => {
+  const toggleFollowing = async () => {
+    if (_id === userId){
+          console.error('Cant add myself.');
+          return;
+      }
     try {
-      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/remove-follower/${followerId}`);
+      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`);
       const response = await fetch(
-        `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/remove-follower/${followerId}`,
+        `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`,
         {
           method: "PATCH",
           headers: {
@@ -42,10 +46,10 @@ const Followers = ({ followerId, name, subtitle, userPicturePath }) => {
       const data = await response.json();
       console.log('Response data:', data);
 
-      dispatch(setFollowers({ followers: data }));
-    } catch (error) {
-      console.error('Error during removeFollower:', error);
-    }
+     dispatch(setFollowing({ following: data }));
+        } catch (error) {
+          console.error('Error during toggleFollowing:', error);
+        }
   };
 
   return (
@@ -54,7 +58,7 @@ const Followers = ({ followerId, name, subtitle, userPicturePath }) => {
         <UserImage image={userPicturePath} size="55px" />
         <Box
           onClick={() => {
-            navigate(`/profile/${followerId}`);
+            navigate(`/profile/${userId}`);
             navigate(0);
           }}
         >
@@ -76,12 +80,12 @@ const Followers = ({ followerId, name, subtitle, userPicturePath }) => {
           </Typography>
         </Box>
       </FlexBetween>
-      {isFollower && (
+      {!isFollowing && (
         <IconButton
-          onClick={removeFollower}
+          onClick={toggleFollowing}
           sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
         >
-          <PersonRemoveOutlined sx={{ color: primaryDark }} />
+         <PersonAddOutlined sx={{ color: primaryDark }} />
         </IconButton>
       )}
     </FlexBetween>

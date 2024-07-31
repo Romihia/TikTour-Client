@@ -39,13 +39,13 @@ const FollowerListWidget = ({ userId }) => {
       </Typography>
       <Box display="flex" flexDirection="column" gap="1.5rem">
         {followers.length > 0 ? (
-          followers.map((follower) => (
+          followers.map((user) => (
             <Followers
-              key={follower._id}
-              followerId={follower._id}
-              name={`${follower.firstName} ${follower.lastName}`}
-              subtitle={follower.rank}
-              userPicturePath={follower.picturePath}
+              key={user._id}
+              userId={user._id}
+              name={`${user.firstName} ${user.lastName}`}
+              subtitle={user.rank}
+              userPicturePath={user.picturePath}
             />
           ))
         ) : (
