@@ -11,7 +11,7 @@ const AboutPage = () => {
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
-        const response = await fetch('https://tiktour-server-fkoi.onrender.com/about');
+        const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/about`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
