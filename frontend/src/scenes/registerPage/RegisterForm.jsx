@@ -45,7 +45,7 @@ const registerSchema = yup.object().shape({
     .required("Required"),
   location: yup
     .string()
-    .matches(/^[A-Za-z]+$/, "Location must contain only English letters")
+    .matches(/^[A-Za-z\s]+$/, "Location must contain only English letters")
     .min(1, "Location must be at least 1 character")
     .max(50, "Location must be at most 50 characters"),
   username: yup
