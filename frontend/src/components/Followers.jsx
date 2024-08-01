@@ -50,6 +50,7 @@ const Followers = ({ userId, name, subtitle, userPicturePath }) => {
         } catch (error) {
           console.error('Error during toggleFollowing:', error);
         }
+    window.location.reload();
   };
 
   return (
