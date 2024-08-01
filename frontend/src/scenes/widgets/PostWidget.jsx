@@ -134,7 +134,7 @@ const PostWidget = ({
     setEditDescription(editDescription);
     setEditLocation(editLocation); // Reset location after posting
     setEditHashtags(editHashtags); // Clear the hashtags list
-    alert("The post was posted successfully!");
+    alert("The post was edited successfully!");
   };
 
 
