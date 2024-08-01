@@ -243,8 +243,15 @@ const RegisterForm = () => {
                     color="primary"
                   />
                 }
-                label="I agree to the terms and conditions"
-                sx={{ gridColumn: "span 4" }}
+                label={
+                  <span>
+                    I agree to the{" "}
+                    <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">
+                      terms and conditions
+                    </a>
+                  </span>
+                }
+                sx={{ gridColumn: "span 4", textAlign: "left" }}
               />
               {touched.terms && errors.terms && (
                 <Typography color="error" sx={{ gridColumn: "span 4" }}>
