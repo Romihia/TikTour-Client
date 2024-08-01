@@ -65,7 +65,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   return (
     <>
-      <ul style={{ display: 'flex', flexDirection: 'column-reverse' }}>
+      <ul style={{ display: 'flex', flexDirection: isProfile ? 'column-reverse' : 'column' }}>
         {posts.map(
           ({
             _id,

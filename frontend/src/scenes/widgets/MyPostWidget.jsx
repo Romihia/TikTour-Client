@@ -56,18 +56,24 @@ const MyPostWidget = ({ picturePath }) => {
     formData.append("description", post + hashtagsSuffix);
     formData.append("location", location); // Add location to formData
     formData.append("hashtags", hashtagsList.join(',')); // Join hashtags with a delimiter
-
+  
     if (image) {
       formData.append("picture", image);
       formData.append("picturePath", image.name);
     }
-
+  
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
-    const posts = await response.json();
+    let posts = await response.json();
+
+    window.location.reload();
+
+    // Sort posts by createdAt in descending order
+    posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
     dispatch(setPosts({ posts }));
     setImage(null);
     setPost("");
@@ -75,6 +81,9 @@ const MyPostWidget = ({ picturePath }) => {
     setAddedLocation(false);
     setHashtagsList([]); // Clear the hashtags list
     alert("The post was posted successfully!");
+
+    window.location.reload();
+
     
   };
 

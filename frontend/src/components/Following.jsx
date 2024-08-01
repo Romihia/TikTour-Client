@@ -20,6 +20,7 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
   const medium = palette.neutral.medium;
 
   const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
+  
   const toggleFollowing = async () => {
     if (_id === userId){
         console.error('Cant add myself.');
@@ -46,10 +47,14 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
       console.log('Response data:', data);
 
       dispatch(setFollowing({ following: data }));
+      
     } catch (error) {
       console.error('Error during toggleFollowing:', error);
     }
+
+    window.location.reload();
   };
+
 
   return (
     <FlexBetween>
@@ -91,6 +96,8 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
       </IconButton>
     </FlexBetween>
   );
+
+  
 };
 
 export default Following;
