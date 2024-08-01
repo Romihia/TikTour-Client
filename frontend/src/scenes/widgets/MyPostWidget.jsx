@@ -49,31 +49,31 @@ const MyPostWidget = ({ picturePath }) => {
   const medium = palette.neutral.medium;
 
   const handlePost = async () => {
-    const formData = new FormData();
-    let hashtagsSuffix = " ";
-    hashtagsList.forEach((hashtag) => { hashtagsSuffix += '#' + hashtag + ' '; });
-    formData.append("userId", _id);
-    formData.append("description", post + hashtagsSuffix);
-    formData.append("location", location); // Add location to formData
-    formData.append("hashtags", hashtagsList.join(',')); // Join hashtags with a delimiter
-  
+    const formData = {
+      userId: _id,
+      description: post,
+      location,
+      hashtags: hashtagsList,
+    };
+
     if (image) {
-      formData.append("picture", image);
-      formData.append("picturePath", image.name);
+      formData["picturePath"] = image.name;
     }
-  
+
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
     });
-    let posts = await response.json();
 
+    let posts = await response.json();
     window.location.reload();
 
     // Sort posts by createdAt in descending order
     posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
     dispatch(setPosts({ posts }));
     setImage(null);
     setPost("");
@@ -81,10 +81,8 @@ const MyPostWidget = ({ picturePath }) => {
     setAddedLocation(false);
     setHashtagsList([]); // Clear the hashtags list
     alert("The post was posted successfully!");
-
     window.location.reload();
 
-    
   };
 
   return (
@@ -109,6 +107,7 @@ const MyPostWidget = ({ picturePath }) => {
             sx={{
               width: "100%", // Full width of the container
               backgroundColor: palette.neutral.light,
+              minHeight: "100px",
               borderRadius: "2rem",
               padding: "1rem 2rem",
               marginTop: "0.5rem" // Add some spacing between the label and the input
@@ -196,6 +195,9 @@ const MyPostWidget = ({ picturePath }) => {
               const updatedList = [...hashtagsList];
               updatedList.push(hashtag);
               setHashtagsList(updatedList);
+              console.log("Printing updated list");
+              hashtagsList.forEach((hashtag, index) => console.log(hashtag, index));
+              console.log("HashtagsList: " , hashtagsList);
             }}
           />
         )}
@@ -210,7 +212,9 @@ const MyPostWidget = ({ picturePath }) => {
             color={mediumMain}
             sx={{ "&:hover": { cursor: "pointer", color: medium } }}
           >
+            <b>
             Image
+            </b>
           </Typography>
         </FlexBetween>
 

@@ -17,6 +17,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     dispatch(setPosts({ posts: data }));
   };
 
+
   const getUserPosts = async () => {
     const response = await fetch(
       `${process.env.REACT_APP_URL_BACKEND}/posts/${userId}/posts`,
@@ -26,6 +27,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       }
     );
     const data = await response.json();
+    console.log("Posts: " + data);
     dispatch(setPosts({ posts: data }));
   };
 
@@ -36,6 +38,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       getUserAndFollowingPosts();
     }
   }, [userId, isProfile, dispatch, token]); // Add dispatch and token to dependency array
+ 
 
   const handleLikePost = async (postId) => {
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
@@ -75,6 +78,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             location,
             picturePath,
             userPicturePath,
+            hashtags,
             likes,
             dislikes,
           }) => (
@@ -87,6 +91,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
               location={location}
               picturePath={picturePath}
               userPicturePath={userPicturePath}
+              hashtags={hashtags}
               likes={likes}
               dislikes={dislikes}
               onLike={() => handleLikePost(_id)}
@@ -97,6 +102,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       </ul>
     </>
   );
+
 };
 
 export default PostsWidget;
