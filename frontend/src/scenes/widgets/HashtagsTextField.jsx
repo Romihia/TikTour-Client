@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TagOutlined } from '@mui/icons-material';
+import { PlayLessonOutlined, TagOutlined } from '@mui/icons-material';
 import Hashtag from "./Hashtag";
 
 
@@ -26,19 +26,26 @@ const HashtagsTextField = ({ setHashtags, hashtags, onSavingHashtag }) => {
   const buttonStyle = {
     cursor: 'pointer',
     borderRadius: '10px',
-    backgroundColor: 'lightblue',
-    borderWidth: '1px',
+    backgroundColor: 'black',
+    borderWidth: '0',
     margin: '3px',
     transition: 'background-color 0.3s ease',
+    color: 'white',
+    height: '30px', 
   };
 
   const inputStyle = {
-    width: '80%',
-    padding: '8px',
     backgroundColor: '#eeeeee',
-    borderRadius: '10px',
-    borderWidth: '0.5px',
+    borderRadius: '50px',
+    padding: '1rem', // Corrected from `p`
+    width: '60%',
+    borderWidth: '0',
+    height: '60px',
+    textAlign: 'center',
+    lineHeight: '60px' // Match this to the height of the input for vertical centering
   };
+  
+
 
   const hashtagsContainerStyle = {
     marginTop: '10px',
@@ -90,7 +97,7 @@ const HashtagsTextField = ({ setHashtags, hashtags, onSavingHashtag }) => {
             width: 'fit-content',
             lineBreak: 'normal'
           }}>
-            <TagOutlined />
+            <TagOutlined style={{ color: 'red'}}/>
             <p style={{ color: 'red', marginRight: '5px', fontWeight: 'bold' }}>Hashtags: </p>
           </div>
           <div>
