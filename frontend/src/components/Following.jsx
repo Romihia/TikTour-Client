@@ -12,7 +12,7 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const following = useSelector((state) => state.user.following || []);
-
+  const loggedInUserId = useSelector((state) => state.user._id);
   const { palette } = useTheme();
   const primaryLight = palette.primary.light;
   const primaryDark = palette.primary.dark;
@@ -20,6 +20,7 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
   const medium = palette.neutral.medium;
 
   const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
+  
   const toggleFollowing = async () => {
     if (_id === userId){
         console.error('Cant add myself.');
@@ -41,15 +42,18 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
       const data = await response.json();
       console.log('Response data:', data);
 
       dispatch(setFollowing({ following: data }));
+      
     } catch (error) {
       console.error('Error during toggleFollowing:', error);
     }
+
+    window.location.reload();
   };
+
 
   return (
     <FlexBetween>
@@ -79,18 +83,22 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
           </Typography>
         </Box>
       </FlexBetween>
+      {userId != loggedInUserId &&
       <IconButton
-        onClick={toggleFollowing}
-        sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
-      >
-        {isFollowing ? (
-          <PersonRemoveOutlined sx={{ color: primaryDark }} />
-        ) : (
-          <PersonAddOutlined sx={{ color: primaryDark }} />
-        )}
-      </IconButton>
+              onClick={toggleFollowing}
+              sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+            >
+              {isFollowing ? (
+                <PersonRemoveOutlined sx={{ color: primaryDark }} />
+              ) : (
+                <PersonAddOutlined sx={{ color: primaryDark }} />
+              )}
+            </IconButton>
+      }
     </FlexBetween>
   );
+
+  
 };
 
 export default Following;

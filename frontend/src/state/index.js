@@ -48,7 +48,8 @@ export const authSlice = createSlice({
         console.error("Following list is empty");
       }
     },
-  },
+    getPosts: (state, action) => { return state.posts; },
+    },
 });
 
 export const {
@@ -58,7 +59,8 @@ export const {
   setPosts,
   setPost,
   setFollowers,
-  setFollowing
+  setFollowing,
+  getPosts,
 } = authSlice.actions;
 
 export default authSlice.reducer;

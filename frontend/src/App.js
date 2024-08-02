@@ -7,6 +7,7 @@ import AboutPage from "scenes/about";
 import ForgotPassword from "scenes/forgotPassword";
 import ResetPassword from "scenes/resetPassword";
 import VerifyEmail from './scenes/verifyUser/VerifyEmail';
+import TermsAndConditions from './scenes/termsPage';
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -59,6 +60,10 @@ function App() {
             <Route 
               path="/verify-email" 
               element={<VerifyEmail  />} 
+              />
+            <Route 
+              path="/terms-and-conditions" 
+              element={<TermsAndConditions  />} 
               />
           </Routes>
         </ThemeProvider>

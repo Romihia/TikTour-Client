@@ -45,7 +45,7 @@ const registerSchema = yup.object().shape({
     .required("Required"),
   location: yup
     .string()
-    .matches(/^[A-Za-z]+$/, "Location must contain only English letters")
+    .matches(/^[A-Za-z\s]+$/, "Location must contain only English letters")
     .min(1, "Location must be at least 1 character")
     .max(50, "Location must be at most 50 characters"),
   username: yup
@@ -243,8 +243,15 @@ const RegisterForm = () => {
                     color="primary"
                   />
                 }
-                label="I agree to the terms and conditions"
-                sx={{ gridColumn: "span 4" }}
+                label={
+                  <span>
+                    I agree to the{" "}
+                    <a href="/terms-and-conditions" target="_blank" rel="noopener noreferrer">
+                      terms and conditions
+                    </a>
+                  </span>
+                }
+                sx={{ gridColumn: "span 4", textAlign: "left" }}
               />
               {touched.terms && errors.terms && (
                 <Typography color="error" sx={{ gridColumn: "span 4" }}>
