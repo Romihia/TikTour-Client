@@ -51,6 +51,7 @@ const MyPostWidget = ({ picturePath }) => {
   const handlePost = async () => {
     const formData = {
       userId: _id,
+      sharedById: "",
       description: post,
       location,
       hashtags: hashtagsList,
