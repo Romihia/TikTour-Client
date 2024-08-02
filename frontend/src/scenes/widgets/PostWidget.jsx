@@ -10,17 +10,19 @@ import { Box, IconButton, Typography, useTheme, InputBase, Button } from "@mui/m
 import FlexBetween from "components/FlexBetween";
 import Following from "components/Following";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
 import Dropzone from "react-dropzone";
 import HashtagsTextField from "./HashtagsTextField";
+import { useNavigate } from "react-router-dom";
 
-import { getPosts } from "state";
+import { getPosts, setPosts } from "state";
 
 const PostWidget = ({
   postId,
   postUserId,
+  sharedById,
   name,
   description,
   location,
@@ -30,9 +32,47 @@ const PostWidget = ({
   likes,
   dislikes,
 }) => {
+  
+  const sharePost = async (sharedById="") => {
+    const formData = {
+      userId: postUserId,
+      sharedById: sharedById,
+      description: description,
+      location: location,
+      hashtags: hashtags,
+      picturePath: picturePath,
+    };
+
+    console.log(formData);
+
+    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
+      method: "POST",
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    let posts = await response.json();
+    console.log("posts: ",posts);
+
+    // Sort posts by createdAt in descending order
+
+    posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    dispatch(setPosts({ posts }));
+    
+    alert("The post was posted successfully!");
+    window.location.reload();
+
+  };
+
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
+  const loggedInUsername = useSelector((state) => state.user.username);
+  
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
   const isDisLiked = Boolean(dislikes[loggedInUserId]);
@@ -47,6 +87,30 @@ const PostWidget = ({
   const [editImage, setEditImage] = useState(picturePath);
   const [editHashtags, setEditHashtags] = useState(hashtags); // Add this line if hashtags are stored
   const [editLocation, setEditLocation] = useState(location);
+
+  const [sharedByUsername, setSharedByUsername] = useState("");
+
+  useEffect(() => {
+    const fetchSharedByUsername = async () => {
+      if (sharedById) {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${sharedById}`, {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.ok) {
+            const userData = await response.json();
+            setSharedByUsername(userData.username); // Assume the API returns the user object with a username field
+          }
+        } catch (error) {
+          console.error("Failed to fetch username:", error);
+        }
+      }
+    };
+    fetchSharedByUsername();
+  }, [sharedById, token]);
+
 
   const patchLike = async () => {
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
@@ -136,8 +200,6 @@ const PostWidget = ({
     setEditHashtags(editHashtags); // Clear the hashtags list
     alert("The post was edited successfully!");
   };
-
-
   const renderImagePreview = () => {
     if (isEditing) {
       if (!editImage) {
@@ -192,6 +254,28 @@ const PostWidget = ({
   };
   return (
     <WidgetWrapper m="2rem 0">
+        {sharedById !== ""  && sharedById !== undefined && 
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+          backgroundColor: palette.primary.main,
+          color: 'white',
+          width: 'fit-content',
+          padding: '5px 10px',
+          borderRadius: "2rem",
+          boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+          cursor: "pointer",
+        }}>
+        <span onClick={ () => {
+          navigate(`/profile/${sharedById}`);
+          navigate(0);
+        }}
+        >Shared by {sharedByUsername}
+        </span>
+      </div>
+      } 
       <Following
         userId={postUserId}
         name={name}
@@ -306,7 +390,7 @@ const PostWidget = ({
               <Typography>{disLikeCount}</Typography>
             </FlexBetween>
             <FlexBetween gap="1rem">
-              {loggedInUserId === postUserId && (
+              {(loggedInUserId === postUserId || loggedInUserId === sharedById) && (
                 <IconButton onClick={deletePost}>
                   <DeleteOutline sx={{ color: primary }} />
                 </IconButton>
@@ -319,7 +403,12 @@ const PostWidget = ({
                 </IconButton>
               )}
             </FlexBetween>
-            <IconButton>
+
+            <IconButton onClick={() => {
+              console.log("logged in user id:", loggedInUserId);
+              console.log("LoggedInUsername:", loggedInUsername);
+              sharePost(loggedInUserId, loggedInUsername);
+            }}>
               <ShareOutlined />
             </IconButton>
           </FlexBetween>

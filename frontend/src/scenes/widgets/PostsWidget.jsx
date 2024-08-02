@@ -67,12 +67,13 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   };
 
   return (
-    <>
+    <div>
       <ul style={{ display: 'flex', flexDirection: isProfile ? 'column-reverse' : 'column' }}>
         {posts.map(
           ({
             _id,
             userId,
+            sharedById,
             userName,
             description,
             location,
@@ -86,6 +87,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
               key={_id}
               postId={_id}
               postUserId={userId}
+              sharedById={sharedById}
               name={userName}
               description={description}
               location={location}
@@ -100,7 +102,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           )
         )}
       </ul>
-    </>
+    </div>
   );
 
 };
