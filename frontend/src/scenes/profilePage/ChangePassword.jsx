@@ -3,7 +3,6 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } 
 
 const ChangePasswordDialog = ({ open, onClose, onChangePassword, oldPassword, setOldPassword,
 newPassword, setNewPassword, confirmNewPassword, setConfirmNewPassword }) => {
-
   const handleChangePassword = () => {
     if (newPassword !== confirmNewPassword) {
       alert('New passwords do not match.');

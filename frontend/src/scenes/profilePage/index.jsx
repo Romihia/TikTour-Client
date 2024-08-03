@@ -14,6 +14,7 @@ import TotalLikesWidget from "scenes/widgets/TotalLikesWidget";
 import TopLikerWidget from "scenes/widgets/TopLikerWidget";
 import { setFollowing } from "state";
 import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
+import ProfileCompletionDialog from 'scenes/profilePage/EditProfile';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -31,6 +32,9 @@ const ProfilePage = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [openProfileDialog, setOpenProfileDialog] = useState(false);
+  const handleOpenDialog = () => setOpenProfileDialog(true);
+  const handleCloseDialog = () => setOpenProfileDialog(false);
 
 
   const getUser = async () => {
@@ -171,6 +175,14 @@ const ProfilePage = () => {
                             >
                               Change Password
                             </Button>
+              <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleOpenDialog}
+                          sx={{ mt: "1rem"}}
+                        >
+                          Edit Profile
+                        </Button>
               <FollowersWidget userId={userId} />
               <Box m="2rem 0" />
               <FollowingWidget userId={userId} />
@@ -190,6 +202,10 @@ const ProfilePage = () => {
           <PostsWidget userId={userId} isProfile />
         </Box>
       </Box>
+      <ProfileCompletionDialog
+              open={openProfileDialog}
+              onClose={handleCloseDialog}
+            />
       <ChangePasswordDialog
               open={openPasswordDialog}
               onClose={() => setOpenPasswordDialog(false)}
@@ -202,7 +218,6 @@ const ProfilePage = () => {
               setConfirmNewPassword={setConfirmNewPassword}
             />
     </Box>
-
   );
 };
 
