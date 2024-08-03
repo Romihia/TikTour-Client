@@ -57,7 +57,7 @@ const ProfilePage = () => {
       const response = await fetch(
         `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/${userId}`,
         {
-          method: isFollowing ? "DELETE" : "POST",
+          method:"PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -143,14 +143,15 @@ const ProfilePage = () => {
           <UserWidget userId={userId} picturePath={user.picturePath} />
           {loggedInUserId !== userId && (
             <Button
-              variant="contained"
-              color={isFollowing ? "secondary" : "primary"}
-              onClick={toggleFollowing}
-              sx={{ mt: "1rem", backgroundColor: primaryLight, color: primaryDark }}
-              startIcon={isFollowing ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
-            >
-              {isFollowing ? "Unfollow" : "Follow"}
-            </Button>
+            variant="contained"
+            color={isFollowing ? "secondary" : "primary"}
+            onClick={toggleFollowing}
+            sx={{ mt: "1rem", backgroundColor: primaryLight, color: primaryDark }}
+            startIcon={isFollowing ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
+          >
+            {isFollowing ? "Unfollow" : "Follow"}
+          </Button>
+          
           )}
           <Box m="2rem 0" />
           {loggedInUserId === userId && (
