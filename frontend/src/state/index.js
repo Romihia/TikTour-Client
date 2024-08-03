@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 
 const initialState = {
   mode: "light",
   user: null,
-  token: null,
+  token: Cookies.get("token") || null,
   posts: [],
   followers: [],
   following: [],
@@ -19,10 +20,14 @@ export const authSlice = createSlice({
     setLogin: (state, action) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
+
+      const options = action.payload.rememberMe ? { expires: 1 } : { expires: 0.5 };
+      Cookies.set("token", action.payload.token, options);
     },
     setLogout: (state) => {
       state.user = null;
       state.token = null;
+      Cookies.remove("token");
     },
     setPosts: (state, action) => {
       state.posts = action.payload.posts;
@@ -48,8 +53,8 @@ export const authSlice = createSlice({
         console.error("Following list is empty");
       }
     },
-    getPosts: (state, action) => { return state.posts; },
-    },
+    getPosts: (state) => { return state.posts; },
+  },
 });
 
 export const {
