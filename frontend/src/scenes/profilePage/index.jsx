@@ -14,11 +14,12 @@ import TotalLikesWidget from "scenes/widgets/TotalLikesWidget";
 import TopLikerWidget from "scenes/widgets/TopLikerWidget";
 import { setFollowing } from "state";
 import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
+import ProfileEdit from 'scenes/profilePage/ProfileEdit';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
-  const following = useSelector((state) => state.user.following || []);
   const { userId } = useParams();
+  const following = useSelector((state) => state.user.following || []);
   const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -32,6 +33,7 @@ const ProfilePage = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [openProfileEdit, setOpenProfileEdit] = useState(false);
 
   const getUser = async () => {
     try {
@@ -95,7 +97,10 @@ const ProfilePage = () => {
       }
     }
   };
+  const editAccount = async () => {
+      setOpenProfileEdit(true);
 
+  };
   const passwordChange = async (oldPassword, newPassword) => {
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/password`, {
@@ -171,6 +176,14 @@ const ProfilePage = () => {
               >
                 Change Password
               </Button>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={editAccount}
+                sx={{ mt: "1rem" }}
+              >
+                Edit Account
+              </Button>
               <FollowersWidget userId={userId} />
               <Box m="2rem 0" />
               <FollowingWidget userId={userId} />
@@ -206,6 +219,12 @@ const ProfilePage = () => {
         confirmNewPassword={confirmNewPassword}
         setConfirmNewPassword={setConfirmNewPassword}
       />
+      {openProfileEdit && (
+        <ProfileEdit
+          open={openProfileEdit}
+          onClose={() => setOpenProfileEdit(false)}
+        />
+      )}
     </Box>
   );
 };
