@@ -317,7 +317,6 @@ const PostWidget = ({
             )}
           </Dropzone>
           </div>
-
           <div style={styles.editBoxChild}><b>Location:</b>
           <InputBase
             placeholder="Edit location..."
