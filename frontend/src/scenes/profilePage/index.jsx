@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, Button, useTheme, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Box, useMediaQuery, Button, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,7 +32,6 @@ const ProfilePage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
-
   const getUser = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${userId}`, {
@@ -55,17 +54,16 @@ const ProfilePage = () => {
 
   const toggleFollowing = async () => {
     try {
-      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`);
-                  const response = await fetch(
-                    `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/${userId}`,
-                    {
-                      method: "DELETE",
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                  }
-                );
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/${userId}`,
+        {
+          method: isFollowing ? "DELETE" : "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -76,28 +74,29 @@ const ProfilePage = () => {
       console.error('Error during toggleFollowing:', error);
     }
   };
+
   const deleteAccount = async () => {
     const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (confirmed){
-    try {
-          const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+    if (confirmed) {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          alert('Account deleted successfully');
-          navigate('/login');
-          // Redirect user or handle post-deletion logic here
-        } catch (error) {
-          console.error('Error during account deletion:', error);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        alert('Account deleted successfully');
+        navigate('/login');
+      } catch (error) {
+        console.error('Error during account deletion:', error);
+      }
     }
   };
+
   const passwordChange = async (oldPassword, newPassword) => {
     if (newPassword !== confirmNewPassword) {
       alert('New passwords do not match.');
@@ -128,6 +127,7 @@ const ProfilePage = () => {
       alert('Error changing password');
     }
   };
+
   useEffect(() => {
     getUser();
   }, [userId, loggedInUserId, token]);
@@ -161,21 +161,21 @@ const ProfilePage = () => {
           {loggedInUserId === userId && (
             <>
               <Button
-                              variant="contained"
-                              color="error"
-                              onClick={deleteAccount}
-                              sx={{ mt: "1rem" }}
-                            >
-                              Delete Account
-                            </Button>
+                variant="contained"
+                color="error"
+                onClick={deleteAccount}
+                sx={{ mt: "1rem" }}
+              >
+                Delete Account
+              </Button>
               <Button
-                              variant="contained"
-                              color="primary"
-                              onClick={() => setOpenPasswordDialog(true)}
-                              sx={{ mt: "1rem", ml: "1rem" }}
-                            >
-                              Change Password
-                            </Button>
+                variant="contained"
+                color="primary"
+                onClick={() => setOpenPasswordDialog(true)}
+                sx={{ mt: "1rem", ml: "1rem" }}
+              >
+                Change Password
+              </Button>
               <FollowersWidget userId={userId} />
               <Box m="2rem 0" />
               <FollowingWidget userId={userId} />
@@ -190,24 +190,28 @@ const ProfilePage = () => {
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          <MyPostWidget picturePath={user.picturePath} />
-          <Box m="2rem 0" />
+          {/* Display MyPostWidget only if the logged-in user is viewing their own profile */}
+          {loggedInUserId === userId && (
+            <>
+              <MyPostWidget picturePath={user.picturePath} />
+              <Box m="2rem 0" />
+            </>
+          )}
           <PostsWidget userId={userId} isProfile />
         </Box>
       </Box>
       <ChangePasswordDialog
-              open={openPasswordDialog}
-              onClose={() => setOpenPasswordDialog(false)}
-              onChangePassword={passwordChange}
-              oldPassword = {oldPassword}
-              setOldPassword = {setOldPassword}
-              newPassword = {newPassword}
-              setNewPassword = {setNewPassword}
-              confirmNewPassword={confirmNewPassword}
-              setConfirmNewPassword={setConfirmNewPassword}
-            />
+        open={openPasswordDialog}
+        onClose={() => setOpenPasswordDialog(false)}
+        onChangePassword={passwordChange}
+        oldPassword={oldPassword}
+        setOldPassword={setOldPassword}
+        newPassword={newPassword}
+        setNewPassword={setNewPassword}
+        confirmNewPassword={confirmNewPassword}
+        setConfirmNewPassword={setConfirmNewPassword}
+      />
     </Box>
-
   );
 };
 
