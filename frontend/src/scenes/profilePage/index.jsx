@@ -99,14 +99,9 @@ const ProfilePage = () => {
     }
   };
   const passwordChange = async (oldPassword, newPassword) => {
-    if (newPassword !== confirmNewPassword) {
-      alert('New passwords do not match.');
-      return;
-    }
-
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/password`, {
-        method: "PATCH",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -118,14 +113,14 @@ const ProfilePage = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('Old password is incorrect');
       }
 
       alert('Password changed successfully');
       setOpenPasswordDialog(false);
     } catch (error) {
-      console.error('Error during password change:', error);
-      alert('Error changing password');
+      console.error('Error during password change:',error);
+      alert(error);
     }
   };
   useEffect(() => {
