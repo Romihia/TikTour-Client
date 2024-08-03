@@ -6,7 +6,7 @@ import { setFollowing, setFollowers } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const Followers = ({ userId, name, subtitle, userPicturePath }) => {
+const Followers = ({ userId, name, subtitle, userPictureId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
@@ -54,7 +54,7 @@ const Followers = ({ userId, name, subtitle, userPicturePath }) => {
   return (
     <FlexBetween>
       <FlexBetween gap="1rem">
-        <UserImage image={`${process.env.REACT_APP_URL_BACKEND}/picture/${userPicturePath}`} size="55px" />
+        <UserImage image={`${process.env.REACT_APP_URL_BACKEND}/picture/${userPictureId}`} size="55px" />
         <Box
           onClick={() => {
             navigate(`/profile/${userId}`);
