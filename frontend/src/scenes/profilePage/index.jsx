@@ -59,11 +59,11 @@ const ProfilePage = () => {
 
   const toggleFollowing = async () => {
     try {
-      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`);
+      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/${userId}`);
                   const response = await fetch(
                     `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/${userId}`,
                     {
-                      method: "DELETE",
+                      method: "PATCH",
                       headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json",
