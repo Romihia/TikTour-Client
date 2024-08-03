@@ -16,7 +16,6 @@ import { setPost } from "state";
 import Dropzone from "react-dropzone";
 import HashtagsTextField from "./HashtagsTextField";
 import { useNavigate } from "react-router-dom";
-import { getPosts, setPosts } from "state";
 
 const PostWidget = ({
   postId,
@@ -31,6 +30,8 @@ const PostWidget = ({
   likes,
   dislikes,
 }) => {
+  console.log("pictureId", pictureId);
+  console.log("userPictureId", userPictureId);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
@@ -48,10 +49,27 @@ const PostWidget = ({
 
   const [isEditing, setIsEditing] = useState(false);
   const [editDescription, setEditDescription] = useState(description);
-  const [editPictureId, setEditImage] = useState(pictureId);
+  const [editPictureId, setEditPictureId] = useState(pictureId);
   const [editHashtags, setEditHashtags] = useState(hashtags);
   const [editLocation, setEditLocation] = useState(location);
   const [selectedFile, setSelectedFile] = useState(null);
+  useEffect(() => {
+    const fetchPicture = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/picture/${pictureId}`, {
+          method: "GET"
+        });
+        if (response.ok) {
+          setEditPictureId(response.url);
+        }
+      } catch (error) {
+        console.error("Error fetching user picture:", error);
+      }
+    };
+
+    fetchPicture();
+  }, [editPictureId]);
+  console.log(` picture`, editPictureId);
 
   const [sharedByUsername, setSharedByUsername] = useState("");
 
@@ -182,8 +200,9 @@ const PostWidget = ({
         return <p>Add Image Here</p>;
       }
 
-      const imageUrl = selectedFile ? URL.createObjectURL(selectedFile) : `${process.env.REACT_APP_URL_BACKEND}/picture/${editPictureId}`;
-      console.log("loding image url: " + imageUrl);
+      const imageUrl = selectedFile ? URL.createObjectURL(selectedFile) : `${editPictureId}`;
+      
+      console.log("loading image url: " + imageUrl);
       return (
         <FlexBetween>
           <Typography>{selectedFile ? selectedFile.name : editPictureId}</Typography>
@@ -195,8 +214,7 @@ const PostWidget = ({
         return null;
       }
 
-      const imageUrl = `${process.env.REACT_APP_URL_BACKEND}/picture/${editPictureId}`;
-
+      const imageUrl = `${editPictureId}`;
       return (
         <FlexBetween>
           <img src={imageUrl} alt="preview" style={{ width: "40%", height: "auto", borderRadius: "0.75rem", display: "block", margin: "auto" }} />

@@ -65,19 +65,45 @@ const MyPostWidget = ({ pictureId }) => {
 
     fetchUserPicture();
   }, [userPicture]);
+const uploadImage = async (imageFile) => {
+  const formData = new FormData();
+  formData.append("picture", imageFile);
 
-  const handlePost = async () => {
-    const formData = {
-      userId: _id,
-      sharedById: "",
-      description: post,
-      location,
-      hashtags: hashtagsList,
-    };
+  const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/picture/upload`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
 
-    if (image) {
-      formData["pictureId"] = image.name;
+  if (!response.ok) {
+    throw new Error("Failed to upload image");
+  }
+
+  const data = await response.json();
+  return data.fileId; // Adjust this based on your backend response
+};
+
+const handlePost = async () => {
+  let imageId = "";
+
+  if (image) {
+    try {
+      imageId = await uploadImage(image);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Failed to upload image");
+      return;
     }
+  }
+
+  const formData = {
+    userId: _id,
+    sharedById: "",
+    description: post,
+    location,
+    hashtags: hashtagsList,
+    pictureId: imageId,
+  };
 
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
       method: "POST",
