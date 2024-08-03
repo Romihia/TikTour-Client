@@ -3,6 +3,7 @@ import { Box, Button, TextField, Typography, Checkbox, FormControlLabel, Snackba
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
+import ProfileCompletionPrompt from "../profileCompletion/ProfileCompletionPrompt";
 
 const invalidChars = /[^A-Za-z\d!@#$%^&*]/g;
 
@@ -76,6 +77,9 @@ const RegisterForm = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Updated state
   const [loading, setLoading] = useState(false); // Loading state
+  const [openProfileCompletion, setOpenProfileCompletion] = useState(false);
+  const [userCredentials, setUserCredentials] = useState(null);
+  const [token, setToken] = useState(null);
 
   const register = async (values, onSubmitProps) => {
     const formData = {
@@ -112,6 +116,11 @@ const RegisterForm = () => {
         setMessage("Registration successful. Please check your email for verification.");
         setSnackbarSeverity('success');
         setOpenSnackbar(true);
+        console.log(savedUser.user);
+        setUserCredentials(savedUser.user);
+        console.log(savedUser.token);
+        setToken(savedUser.token);
+        setOpenProfileCompletion(true);
       }else {
         setMessage(savedUser.error || "Registration failed. Please try again.");
         setSnackbarSeverity('error');
@@ -313,6 +322,14 @@ const RegisterForm = () => {
           {message}
         </Alert>
       </Snackbar>
+      {openProfileCompletion && (
+        <ProfileCompletionPrompt
+          open={openProfileCompletion}
+          onClose={() => setOpenProfileCompletion(false)}
+          userCredntionals={userCredentials}
+          token={token}
+        />
+      )}
     </>
   );
 };
