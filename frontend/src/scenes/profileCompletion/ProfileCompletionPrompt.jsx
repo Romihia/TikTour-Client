@@ -47,17 +47,17 @@ const ProfileCompletionPrompt = ({ open, onClose, userCredntionals, token }) => 
   };
 
   const renderProfilePicture = () => {
-    if (profile.profilePicture) {
-      const imageUrl = typeof profile.profilePicture === "string"
-        ? `${process.env.REACT_APP_URL_BACKEND}/assets/${profile.profilePicture}`
-        : URL.createObjectURL(profile.profilePicture);
+    if (profile.picturePath) {
+      const imageUrl = typeof profile.picturePath === "string"
+        ? `${process.env.REACT_APP_URL_BACKEND}/assets/${profile.picturePath}`
+        : URL.createObjectURL(profile.picturePath);
 
       return (
         <img
           src={imageUrl}
           alt="Profile"
           style={{ width: '100%', height: '100%', borderRadius: '50%' }}
-          onLoad={() => URL.revokeObjectURL(profile.profilePicture)}
+          onLoad={() => URL.revokeObjectURL(profile.picturePath)}
         />
       );
     }
@@ -73,7 +73,7 @@ const ProfileCompletionPrompt = ({ open, onClose, userCredntionals, token }) => 
             <Dropzone 
               onDrop={(acceptedFiles) => {
                 if (acceptedFiles && acceptedFiles[0]) {
-                  setProfile({ ...profile, profilePicture: acceptedFiles[0] });
+                  setProfile({ ...profile, picturePath: acceptedFiles[0] });
                 }
               }}
             >
