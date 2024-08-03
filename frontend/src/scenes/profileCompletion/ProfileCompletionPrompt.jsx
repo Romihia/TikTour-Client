@@ -73,7 +73,8 @@ const ProfileCompletionPrompt = ({ open, onClose, userCredntionals, token }) => 
             <Dropzone 
               onDrop={(acceptedFiles) => {
                 if (acceptedFiles && acceptedFiles[0]) {
-                  setProfile({ ...profile, picturePath: acceptedFiles[0] });
+                  console.log("File uploaded:", acceptedFiles[0].path );
+                  setProfile({ ...profile, picturePath: acceptedFiles[0].path });
                 }
               }}
             >
