@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Button, TextField, Typography, Checkbox, FormControlLabel, useTheme } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setLogin } from "state";
 import Cookies from "js-cookie";
 
@@ -24,6 +24,15 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
 
+  const token = useSelector((state) => state.token);
+
+  useEffect(() => {
+    if (token) {
+      // Redirect to home page if token exists
+      navigate("/home");
+    }
+  }, [token, navigate]);
+
   const login = async (values, onSubmitProps) => {
     const { identifier, password, rememberMe } = values;
 
@@ -33,7 +42,7 @@ const LoginForm = () => {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ identifier, password, rememberMe }),
       });
 
       if (!response.ok) {
@@ -47,7 +56,7 @@ const LoginForm = () => {
       if (loggedIn) {
         const options = rememberMe ? { expires: 7 } : {};
         Cookies.set("token", loggedIn.token, options);
-        dispatch(setLogin({ user: loggedIn.user, token: loggedIn.token }));
+        dispatch(setLogin({ user: loggedIn.user, token: loggedIn.token, rememberMe }));
         navigate("/home");
       } else {
         throw new Error("Login failed");
@@ -98,7 +107,7 @@ const LoginForm = () => {
                 />
               }
               label="Remember Me"
-              sx={{ gridColumn: "span 2", textAlign: "left" }}
+              sx={{ gridColumn: "span 4", textAlign: "left", mt: "1rem" }}
             />
             <Typography
               onClick={() => navigate("/forgot-password")}
@@ -109,8 +118,9 @@ const LoginForm = () => {
                   cursor: "pointer",
                   color: palette.primary.light,
                 },
-                gridColumn: "span 2",
+                gridColumn: "span 4",
                 textAlign: "right",
+                mt: "0.5rem",
               }}
             >
               Forgot Password?
