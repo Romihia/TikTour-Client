@@ -2,7 +2,7 @@ import { PersonRemoveOutlined, PersonAddOutlined } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setFollowing,setFollowers } from "state";
+import { setFollowing, setFollowers } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
@@ -23,11 +23,10 @@ const Followers = ({ userId, name, subtitle, userPicturePath }) => {
 
   const toggleFollowing = async () => {
     if (_id === userId){
-          console.error('Cant add myself.');
-          return;
-      }
+        console.error('Cant add myself.');
+        return;
+    }
     try {
-      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`);
       const response = await fetch(
         `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`,
         {
@@ -44,19 +43,18 @@ const Followers = ({ userId, name, subtitle, userPicturePath }) => {
       }
 
       const data = await response.json();
-      console.log('Response data:', data);
+      dispatch(setFollowing({ following: data }));
+    } catch (error) {
+      console.error('Error during toggleFollowing:', error);
+    }
 
-     dispatch(setFollowing({ following: data }));
-        } catch (error) {
-          console.error('Error during toggleFollowing:', error);
-        }
     window.location.reload();
   };
 
   return (
     <FlexBetween>
       <FlexBetween gap="1rem">
-        <UserImage image={userPicturePath} size="55px" />
+        <UserImage image={`${process.env.REACT_APP_URL_BACKEND}/picture/${userPicturePath}`} size="55px" />
         <Box
           onClick={() => {
             navigate(`/profile/${userId}`);
@@ -81,12 +79,16 @@ const Followers = ({ userId, name, subtitle, userPicturePath }) => {
           </Typography>
         </Box>
       </FlexBetween>
-      {!isFollowing && (
+      {userId != _id && (
         <IconButton
           onClick={toggleFollowing}
           sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
         >
-         <PersonAddOutlined sx={{ color: primaryDark }} />
+          {isFollowing ? (
+            <PersonRemoveOutlined sx={{ color: primaryDark }} />
+          ) : (
+            <PersonAddOutlined sx={{ color: primaryDark }} />
+          )}
         </IconButton>
       )}
     </FlexBetween>

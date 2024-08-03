@@ -11,9 +11,27 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { date } from "yup";
 
-const UserWidget = ({ userId, picturePath }) => {
+
+const UserWidget = ({ userId, pictureId }) => {
+  const [userPicture, setUserPicture] = useState("userUserWidget.png");
+  useEffect(() => {
+    const fetchUserPicture = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/picture/${pictureId}`, {
+          method: "GET"
+        });
+        if (response.ok) {
+          setUserPicture(response.url);
+        }
+      } catch (error) {
+        console.error("Error fetching user picture:", error);
+      }
+    };
+
+    fetchUserPicture();
+  }, [userPicture]);
+  console.log("**************************************************",userPicture);
   const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
@@ -34,7 +52,7 @@ const UserWidget = ({ userId, picturePath }) => {
   useEffect(() => {
     getUser();
   }, [userId, token]);
-
+  
   if (!user) {
     return null;
   }
@@ -60,7 +78,7 @@ const UserWidget = ({ userId, picturePath }) => {
         onClick={() => navigate(`/profile/${userId}`)}
       >
         <FlexBetween gap="1rem">
-          <UserImage image={picturePath} />
+          <UserImage image={userPicture} />
           <Box>
             <Typography
               variant="h4"

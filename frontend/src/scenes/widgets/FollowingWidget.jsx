@@ -45,7 +45,7 @@ const FollowingListWidget = ({ userId }) => {
               userId={user._id}
               name={`${user.firstName} ${user.lastName}`}
               subtitle={user.rank}
-              userPicturePath={user.picturePath}
+              userPicturePath={user.pictureId}
             />
           ))
         ) : (

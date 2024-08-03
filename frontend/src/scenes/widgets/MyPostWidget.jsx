@@ -30,7 +30,8 @@ import HashtagsTextField from "./HashtagsTextField";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 
-const MyPostWidget = ({ picturePath }) => {
+const MyPostWidget = ({ pictureId }) => {
+  const [userPicture, setUserPicture] = useState("userMyPostW.png");
   const [hashtagsList, setHashtagsList] = useState([]);
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
@@ -48,6 +49,23 @@ const MyPostWidget = ({ picturePath }) => {
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
 
+  useEffect(() => {
+    const fetchUserPicture = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/picture/${pictureId}`, {
+          method: "GET"
+        });
+        if (response.ok) {
+          setUserPicture(response.url);
+        }
+      } catch (error) {
+        console.error("Error fetching user picture:", error);
+      }
+    };
+
+    fetchUserPicture();
+  }, [userPicture]);
+
   const handlePost = async () => {
     const formData = {
       userId: _id,
@@ -58,7 +76,7 @@ const MyPostWidget = ({ picturePath }) => {
     };
 
     if (image) {
-      formData["picturePath"] = image.name;
+      formData["pictureId"] = image.name;
     }
 
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
@@ -89,7 +107,7 @@ const MyPostWidget = ({ picturePath }) => {
   return (
     <WidgetWrapper>
       <FlexBetween gap="1.5rem">
-        <UserImage image={picturePath} />
+        <UserImage image={userPicture} />
         <FlexBetween
           sx={{
             flexDirection: 'column', // Arrange children in a column
@@ -162,7 +180,7 @@ const MyPostWidget = ({ picturePath }) => {
       )}
 
       <Box>
-        {addedLocation &&
+        {addedLocation && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -175,7 +193,7 @@ const MyPostWidget = ({ picturePath }) => {
           <p style={{ color: 'red', marginRight: '5px' }}>Location: </p>
           <p>{location}</p>
         </div>
-        }
+        )}
         {showLocationAutocomplete && (
           <LocationAutocomplete
             onSelectLocation={(selectedLocation) => {

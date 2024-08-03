@@ -1,9 +1,8 @@
-import { Box, useMediaQuery, Button, useTheme, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Box, useMediaQuery, Button, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "scenes/navbar";
 import FollowersWidget from "scenes/widgets/FollowersWidget";
 import FollowingWidget from "scenes/widgets/FollowingWidget";
@@ -32,7 +31,6 @@ const ProfilePage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
-
   const getUser = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${userId}`, {
@@ -41,7 +39,6 @@ const ProfilePage = () => {
       });
       const data = await response.json();
       setUser(data);
-
       const followingResponse = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/following/${userId}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
@@ -53,19 +50,37 @@ const ProfilePage = () => {
     }
   };
 
+  const fetchUserPicture = async () => {
+    try {
+      if (!user || !user.pictureId) return;
+
+      console.log(`Sending GET request to ${process.env.REACT_APP_URL_BACKEND}/picture/${user.pictureId}`);
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/picture/${user.pictureId}`, {
+        method: "GET"
+      });
+      if (response.ok) {
+        const imageBlob = await response.blob();
+        const imageUrl = URL.createObjectURL(imageBlob);
+        setUserPicture(imageUrl);
+      }
+    } catch (error) {
+      console.error("Error fetching user picture:", error);
+    }
+  };
+
   const toggleFollowing = async () => {
     try {
       console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`);
-                  const response = await fetch(
-                    `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/${userId}`,
-                    {
-                      method: "DELETE",
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                  }
-                );
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -76,28 +91,30 @@ const ProfilePage = () => {
       console.error('Error during toggleFollowing:', error);
     }
   };
+
   const deleteAccount = async () => {
     const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (confirmed){
-    try {
-          const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+    if (confirmed) {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          alert('Account deleted successfully');
-          navigate('/login');
-          // Redirect user or handle post-deletion logic here
-        } catch (error) {
-          console.error('Error during account deletion:', error);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        alert('Account deleted successfully');
+        navigate('/login');
+        // Redirect user or handle post-deletion logic here
+      } catch (error) {
+        console.error('Error during account deletion:', error);
+      }
     }
   };
+
   const passwordChange = async (oldPassword, newPassword) => {
     if (newPassword !== confirmNewPassword) {
       alert('New passwords do not match.');
@@ -128,9 +145,14 @@ const ProfilePage = () => {
       alert('Error changing password');
     }
   };
+
   useEffect(() => {
     getUser();
   }, [userId, loggedInUserId, token]);
+
+  useEffect(() => {
+    fetchUserPicture();
+  }, [user]);
 
   if (!user) return null;
 
@@ -145,7 +167,7 @@ const ProfilePage = () => {
         justifyContent="center"
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-          <UserWidget userId={userId} picturePath={user.picturePath} />
+          <UserWidget userId={userId} pictureId={user.pictureId} />
           {loggedInUserId !== userId && (
             <Button
               variant="contained"
@@ -161,21 +183,21 @@ const ProfilePage = () => {
           {loggedInUserId === userId && (
             <>
               <Button
-                              variant="contained"
-                              color="error"
-                              onClick={deleteAccount}
-                              sx={{ mt: "1rem" }}
-                            >
-                              Delete Account
-                            </Button>
+                variant="contained"
+                color="error"
+                onClick={deleteAccount}
+                sx={{ mt: "1rem" }}
+              >
+                Delete Account
+              </Button>
               <Button
-                              variant="contained"
-                              color="primary"
-                              onClick={() => setOpenPasswordDialog(true)}
-                              sx={{ mt: "1rem", ml: "1rem" }}
-                            >
-                              Change Password
-                            </Button>
+                variant="contained"
+                color="primary"
+                onClick={() => setOpenPasswordDialog(true)}
+                sx={{ mt: "1rem", ml: "1rem" }}
+              >
+                Change Password
+              </Button>
               <FollowersWidget userId={userId} />
               <Box m="2rem 0" />
               <FollowingWidget userId={userId} />
@@ -190,24 +212,23 @@ const ProfilePage = () => {
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          <MyPostWidget picturePath={user.picturePath} />
+          <MyPostWidget pictureId={user.pictureId} />
           <Box m="2rem 0" />
           <PostsWidget userId={userId} isProfile />
         </Box>
       </Box>
       <ChangePasswordDialog
-              open={openPasswordDialog}
-              onClose={() => setOpenPasswordDialog(false)}
-              onChangePassword={passwordChange}
-              oldPassword = {oldPassword}
-              setOldPassword = {setOldPassword}
-              newPassword = {newPassword}
-              setNewPassword = {setNewPassword}
-              confirmNewPassword={confirmNewPassword}
-              setConfirmNewPassword={setConfirmNewPassword}
-            />
+        open={openPasswordDialog}
+        onClose={() => setOpenPasswordDialog(false)}
+        onChangePassword={passwordChange}
+        oldPassword={oldPassword}
+        setOldPassword={setOldPassword}
+        newPassword={newPassword}
+        setNewPassword={setNewPassword}
+        confirmNewPassword={confirmNewPassword}
+        setConfirmNewPassword={setConfirmNewPassword}
+      />
     </Box>
-
   );
 };
 

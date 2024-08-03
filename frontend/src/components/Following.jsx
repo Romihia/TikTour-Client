@@ -27,24 +27,21 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
         return;
     }
     try {
-      console.log(`Sending PATCH request to ${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`);
-            const response = await fetch(
-              `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`,
-              {
-                method: "PATCH",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-              },
-            }
-          );
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_BACKEND}/users/${_id}/${userId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log('Response data:', data);
-
       dispatch(setFollowing({ following: data }));
       
     } catch (error) {
@@ -54,11 +51,10 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
     window.location.reload();
   };
 
-
   return (
     <FlexBetween>
       <FlexBetween gap="1rem">
-        <UserImage image={userPicturePath} size="55px" />
+        <UserImage image={`${process.env.REACT_APP_URL_BACKEND}/picture/${userPicturePath}`} size="55px" />
         <Box
           onClick={() => {
             navigate(`/profile/${userId}`);
@@ -85,20 +81,18 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
       </FlexBetween>
       {userId != loggedInUserId &&
       <IconButton
-              onClick={toggleFollowing}
-              sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
-            >
-              {isFollowing ? (
-                <PersonRemoveOutlined sx={{ color: primaryDark }} />
-              ) : (
-                <PersonAddOutlined sx={{ color: primaryDark }} />
-              )}
-            </IconButton>
+        onClick={toggleFollowing}
+        sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+      >
+        {isFollowing ? (
+          <PersonRemoveOutlined sx={{ color: primaryDark }} />
+        ) : (
+          <PersonAddOutlined sx={{ color: primaryDark }} />
+        )}
+      </IconButton>
       }
     </FlexBetween>
   );
-
-  
 };
 
 export default Following;
