@@ -17,8 +17,9 @@ import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const following = useSelector((state) => state.user.following || []);
   const { userId } = useParams();
+  const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -45,8 +46,6 @@ const ProfilePage = () => {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
-      const isFollowingData = await followingResponse.json();
-      setIsFollowing(isFollowingData.isFollowing);
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
