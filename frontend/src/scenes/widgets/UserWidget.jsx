@@ -1,8 +1,7 @@
 import {
   ManageAccountsOutlined,
-  EditOutlined,
   LocationOnOutlined,
-  WorkOutlineOutlined,
+  StarOutlined,
 } from "@mui/icons-material";
 import { Box, Typography, Divider, useTheme } from "@mui/material";
 import UserImage from "components/UserImage";
@@ -100,7 +99,7 @@ const UserWidget = ({ userId, picturePath }) => {
           <Typography color={medium}>{location}</Typography>
         </Box>
         <Box display="flex" alignItems="center" gap="1rem">
-          <WorkOutlineOutlined fontSize="large" sx={{ color: main }} />
+          <StarOutlined  fontSize="large" sx={{ color: main }} />
           <Typography color={medium}>{rank || "Loading..."}</Typography>
         </Box>
       </Box>
@@ -123,22 +122,6 @@ const UserWidget = ({ userId, picturePath }) => {
         </FlexBetween>
       </Box>
 
-      {/* RANK */}
-      <Box p="1rem 0">
-        <Typography fontSize="1rem" color={main} fontWeight="500" mb="1rem">
-          Rank
-        </Typography>
-
-        <FlexBetween gap="1rem">
-          <Box>
-            <Typography color={main} fontWeight="500">
-              {rank || "Loading..."}
-            </Typography>
-            <Typography color={medium}>Current Rank</Typography>
-          </Box>
-          <EditOutlined sx={{ color: main }} />
-        </FlexBetween>
-      </Box>
     </WidgetWrapper>
   );
 };
