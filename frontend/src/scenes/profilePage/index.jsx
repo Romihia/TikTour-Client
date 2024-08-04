@@ -127,6 +127,19 @@ const ProfilePage = () => {
     }
   };
 
+
+  const buttonStyle = {
+    width: '60%',
+    margin: '5px',
+    border: '2px groove black',
+    borderRadius: '50px',
+    transition: 'all 0.2s ease-in-out', // Adds transition effect
+    '&:hover': {
+      backgroundColor: 'red', // Change to desired hover background color
+      scale: '1.1'
+    },
+  };
+
   useEffect(() => {
     getUser();
   }, [userId, loggedInUserId, token]);
@@ -157,14 +170,21 @@ const ProfilePage = () => {
           </Button>
           
           )}
-          <Box m="2rem 0" />
           {loggedInUserId === userId && (
-            <>
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              margin: '20px 0'
+            }}>
               <Button
                 variant="contained"
-                color="error"
+                color="primary"
                 onClick={deleteAccount}
-                sx={{ mt: "1rem" }}
+                sx={buttonStyle}
               >
                 Delete Account
               </Button>
@@ -172,23 +192,24 @@ const ProfilePage = () => {
                 variant="contained"
                 color="primary"
                 onClick={() => setOpenPasswordDialog(true)}
-                sx={{ mt: "1rem", ml: "1rem" }}
+                sx={buttonStyle}
               >
                 Change Password
               </Button>
               <Button
                 variant="contained"
-                color="error"
+                color="primary"
                 onClick={editAccount}
-                sx={{ mt: "1rem" }}
+                sx={buttonStyle}
               >
                 Edit Account
               </Button>
-              <FollowersWidget userId={userId} />
-              <Box m="2rem 0" />
-              <FollowingWidget userId={userId} />
-            </>
+            </div>
+
           )}
+          <FollowersWidget userId={userId} />
+          <Box m="2rem 0" />
+          <FollowingWidget userId={userId} />
           <Box m="2rem 0" />
           <TotalLikesWidget userId={userId} />
           <Box m="2rem 0" />

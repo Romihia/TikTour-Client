@@ -253,7 +253,17 @@ const PostWidget = ({
 
   };
   return (
-    <WidgetWrapper m="2rem 0">
+    <WidgetWrapper sx={{
+      margin: '30px',
+      marginTop: '10px',
+      padding: '10px',
+      width: '70%',
+      transition: 'all 0.2s ease-in-out',
+      '&:hover': {
+        scale: '1.1',
+        boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+      }
+    }}>
         {sharedById !== ""  && sharedById !== undefined && 
         <div style={{
           display: "flex",
