@@ -87,7 +87,7 @@ const PostWidget = ({
   const [editImage, setEditImage] = useState(picturePath);
   const [editHashtags, setEditHashtags] = useState(hashtags); // Add this line if hashtags are stored
   const [editLocation, setEditLocation] = useState(location);
-
+  const [locationError, setLocationError] = useState("");
   const [sharedByUsername, setSharedByUsername] = useState("");
 
   useEffect(() => {
@@ -154,6 +154,23 @@ const PostWidget = ({
       } else {
         alert("Failed to delete post");
       }
+    }
+  };
+
+  const isValidLocation = (location) => {
+    const regex = /^[a-zA-Z0-9\s]+$/; // Ensure at least one character is present
+    return regex.test(location);
+  };
+  
+  const handleLocationChange = (e) => {
+    const value = e.target.value;
+    setEditLocation(value);
+    if (value.trim() === "") {
+      setLocationError("Location cannot be empty.");
+    } else if (!isValidLocation(value)) {
+      setLocationError("Location must contain only letters, numbers, and spaces.");
+    } else {
+      setLocationError("");
     }
   };
 
@@ -317,13 +334,25 @@ const PostWidget = ({
             )}
           </Dropzone>
           </div>
+          
           <div style={styles.editBoxChild}><b>Location:</b>
-          <InputBase
-            placeholder="Edit location..."
-            value={editLocation}
-            onChange={(e) => setEditLocation(e.target.value)}
-            sx={{ width: "100%", backgroundColor: palette.neutral.light, borderRadius: "2rem", padding: "1rem 2rem", marginTop: "0.5rem" }}
-          />
+            <InputBase
+              placeholder="Edit location..."
+              value={editLocation}
+              onChange={handleLocationChange}
+              sx={{
+                width: "100%",
+                backgroundColor: palette.neutral.light,
+                borderRadius: "2rem",
+                padding: "1rem 2rem",
+                marginTop: "0.5rem",
+              }}
+            />
+            {locationError && (
+              <Typography color="error" sx={{ mt: "0.5rem" }}>
+                {locationError}
+              </Typography>
+            )}
           </div>
 
           <div style={styles.editBoxChild}><b>Hashtags:</b>
@@ -342,7 +371,13 @@ const PostWidget = ({
           />
           </div>
           <Button onClick={() => setIsEditing(false)} sx={{ marginTop: "1rem" }}>Cancel</Button>
-          <Button onClick={editPost} sx={{ marginTop: "1rem", backgroundColor: palette.primary.main, color: palette.background.alt }}>Save Changes</Button>
+          <Button
+            onClick={editPost}
+            sx={{ marginTop: "1rem", backgroundColor: palette.primary.main, color: palette.background.alt }}
+            disabled={locationError !== ""}
+          >
+            Save Changes
+          </Button>
         </Box>
 
       ) : (
