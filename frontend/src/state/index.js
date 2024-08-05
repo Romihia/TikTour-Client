@@ -53,6 +53,13 @@ export const authSlice = createSlice({
         console.error("Following list is empty");
       }
     },
+    updateUserPicturePath: (state, action) => {
+      if (state.user) {
+        state.user.picturePath = action.payload.picturePath;
+      } else {
+        console.error("User is not logged in");
+      }
+    },
     getPosts: (state) => { return state.posts; },
   },
 });
@@ -66,6 +73,7 @@ export const {
   setFollowers,
   setFollowing,
   getPosts,
+  updateUserPicturePath,
 } = authSlice.actions;
 
 export default authSlice.reducer;
