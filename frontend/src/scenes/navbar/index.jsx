@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   IconButton,
@@ -32,6 +32,8 @@ const Navbar = () => {
   const user = useSelector((state) => state.user);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
+  const token = useSelector((state) => state.token);
+
   const theme = useTheme();
   const neutralLight = theme.palette.neutral.light;
   const dark = theme.palette.neutral.dark;
@@ -39,7 +41,31 @@ const Navbar = () => {
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
 
+  const [searchUsername, setSearchUsername] = useState("");
+  // Log the updated searchUsername whenever it changes
+  useEffect(() => {
+    console.log(searchUsername);
+  }, [searchUsername]);
+
   const fullName = `${user.firstName} ${user.lastName}`;
+
+  const searchForUser = async (username) => {
+    console.log("searchForUser: ", username);
+    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${username}/getByUsername`, {
+        method: "GET",
+        headers: { 
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      console.log("data: ", JSON.stringify(data));
+      if (data._id !== "UsernameNotFound") {
+      navigate(`/profile/${data._id}`);
+      navigate(0);
+      } else {
+      alert("User not found!");
+      }
+  };
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -65,9 +91,14 @@ const Navbar = () => {
             gap="3rem"
             padding="0.1rem 1.5rem"
           >
-            <InputBase placeholder="Search..." />
+            <InputBase 
+            placeholder="Search by username..."
+            onChange={(event) => {
+              setSearchUsername(event.target.value);
+            }}
+            />
             <IconButton>
-              <Search />
+              <Search onClick={() => searchForUser(searchUsername)} />
             </IconButton>
           </FlexBetween>
         )}

@@ -17,7 +17,6 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     dispatch(setPosts({ posts: data }));
   };
 
-
   const getUserPosts = async () => {
     const response = await fetch(
       `${process.env.REACT_APP_URL_BACKEND}/posts/${userId}/posts`,
@@ -37,8 +36,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     } else {
       getUserAndFollowingPosts();
     }
-  }, [userId, isProfile, dispatch, token]); // Add dispatch and token to dependency array
- 
+  }, [userId, isProfile, dispatch, token]);
 
   const handleLikePost = async (postId) => {
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
@@ -67,8 +65,36 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   };
 
   return (
-    <div>
-      <ul style={{ display: 'flex', flexDirection: isProfile ? 'column-reverse' : 'column' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      overflow: 'hidden', // changed to hidden to prevent scrollbars in the main div
+      height: '90vh',
+    }}>
+      <h2 style={{ 
+        textAlign: 'center',
+        padding: '10px',
+        textDecoration: 'underline',
+        fontSize: '40px',
+        color: 'black',
+        marginTop: '20px',
+        marginBottom: '20px',
+        margin: '0'
+      }}>{isProfile ? 'Your Posts' : 'News Feed'}</h2>
+      <ul style={{ 
+        display: 'flex',
+        flexDirection: isProfile ? 'column-reverse' : 'column',
+        padding: '0',
+        margin: '0',
+        overflowY: 'auto', // allow vertical scrolling
+        width: '100%', // ensure the ul takes full width of the parent div
+        flexGrow: '1', // make the ul take remaining space
+        alignItems: 'center',
+
+       }}>
         {posts.map(
           ({
             _id,
