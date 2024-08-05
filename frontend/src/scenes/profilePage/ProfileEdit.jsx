@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Typography, Box } from "@mui/material";
 import Dropzone from "react-dropzone";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { updateUserPicturePath } from "state/index.js"; 
 
 const ProfileCompletionPrompt = ({ open, onClose}) => {
+  const dispatch = useDispatch();
   const { _id,firstName,lastName,location,email,picturePath } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const [profile, setProfile] = useState({
@@ -31,6 +33,7 @@ const ProfileCompletionPrompt = ({ open, onClose}) => {
     });
     if (response.ok) {
       console.log('Profile updated');
+      dispatch(updateUserPicturePath({ picturePath: profile.picturePath }));
       onClose();
     } else {
       console.log('Profile update failed');
@@ -117,7 +120,7 @@ const ProfileCompletionPrompt = ({ open, onClose}) => {
             margin="normal"
           />
           <TextField
-            label="email"
+            label="Email"
             name="email"
             value={profile.email}
             onChange={handleInputChange}
