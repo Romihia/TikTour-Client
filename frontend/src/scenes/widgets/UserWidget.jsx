@@ -87,7 +87,6 @@ const UserWidget = ({ userId, picturePath }) => {
             </Typography>
           </Box>
         </FlexBetween>
-        <ManageAccountsOutlined />
       </FlexBetween>
 
       <Divider />
