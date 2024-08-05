@@ -59,8 +59,12 @@ const Navbar = () => {
       });
       const data = await response.json();
       console.log("data: ", JSON.stringify(data));
+      if (data._id !== "UsernameNotFound") {
       navigate(`/profile/${data._id}`);
       navigate(0);
+      } else {
+      alert("User not found!");
+      }
   };
 
   return (
