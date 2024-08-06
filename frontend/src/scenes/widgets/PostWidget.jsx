@@ -167,6 +167,11 @@ const PostWidget = ({
       "picturePath": editImage ? editImage : picturePath, // If no new image is provided, use the original picturePath
     };
 
+    if (editLocation.trim() === "") {
+      alert("Location can't be empty!");
+      return;
+    }
+    
     console.log("Edit Description: ", editDescription);
     console.log("Edit Location: ", editLocation);
     console.log("Edit Hashtags: ", editHashtags);

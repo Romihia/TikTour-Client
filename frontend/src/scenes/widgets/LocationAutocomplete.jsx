@@ -1,4 +1,3 @@
-import { light } from '@mui/material/styles/createPalette';
 import React, { useState } from 'react';
 
 const LocationAutocomplete = ({ onSelectLocation }) => {
@@ -10,7 +9,11 @@ const LocationAutocomplete = ({ onSelectLocation }) => {
   };
 
   const handleSave = () => {
-    onSelectLocation(selectedLocation); // Pass the selectedLocation to the parent component
+    if (selectedLocation.trim() !== "")
+      onSelectLocation(selectedLocation); // Pass the selectedLocation to the parent component
+    else {
+      alert("Location can't be empty!");
+    }
   };
 
 
