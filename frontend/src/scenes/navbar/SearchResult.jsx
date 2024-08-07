@@ -1,5 +1,6 @@
 import React from 'react';
 import PostWidget from "scenes/widgets/PostWidget";
+import { useNavigate } from "react-router-dom";
 
 const widgetStyle = {
   padding: '10px',
@@ -59,9 +60,22 @@ const handleDislikePost = async (postId) => {
 };
           
 
+
+
 const SearchResult = ({ isPost = false, data }) => {
+  const navigate = useNavigate();
+
+  const onClickFunction = () => {
+    console.log("Clicked!");
+    console.log(JSON.stringify(data));
+    if (!isPost) { 
+      navigate(`/profile/${data._id}`);
+      navigate(0);
+    }
+  };
+
   return (
-    <li style={widgetStyle}>
+    <li style={widgetStyle} onClick={onClickFunction}>
       {isPost ?
       (
         <PostWidget
