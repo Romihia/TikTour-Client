@@ -1,4 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from "@mui/material";
+import { 
+  PeopleAltOutlined,
+  SignpostOutlined,
+  Search
+ } from "@mui/icons-material";
+
 
 const widgetStyle = {
   padding: '20px',
@@ -33,10 +40,10 @@ const buttonStyle = {
   fontSize: '16px',
   margin: '0 5px',
   transition: 'background-color 0.3s ease, transform 0.3s ease',
-
 };
 
 const activeButtonStyle = {
+  color: 'white',
   backgroundColor: 'lightpink',
   transform: 'scale(1.2)',
   transition: 'background-color 0.3s ease',
@@ -45,7 +52,7 @@ const activeButtonStyle = {
 
 };
 
-const SearchAttributesDialog = ({ chosenAttributes, setChosenAttributes }) => {
+const SearchAttributesDialog = ({ chosenAttributes, setChosenAttributes, advancedSearchOnClick }) => {
   const [searchType, setSearchType] = useState('users');
 
   useEffect(() => {
@@ -78,31 +85,42 @@ const SearchAttributesDialog = ({ chosenAttributes, setChosenAttributes }) => {
   };
 
   const attributesToShow = searchType === 'users' ? allUserAttributes : postAttributes;
+  const [hover, setHover] = useState(false);
 
   return (
     <div style={widgetStyle}>
       <div style={{ 
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'space-evenly',
         marginBottom: '10px',
       }}>
         <button 
           style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             ...buttonStyle,
             ...(searchType === 'users' ? activeButtonStyle : {})
           }}
           onClick={() => handleSearchTypeChange('users')}
         >
-          Search Users
+          {searchType === 'users' && <PeopleAltOutlined style={{margin: '5px'}}/>}
+
+          Users
         </button>
         <button 
           style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             ...buttonStyle,
             ...(searchType === 'posts' ? activeButtonStyle : {})
           }}
           onClick={() => handleSearchTypeChange('posts')}
         >
-          Search Posts
+          {searchType === 'posts' && <SignpostOutlined style={{margin: '5px'}}/>}
+
+          Posts
         </button>
       </div>
       {attributesToShow.map((attribute) => (
@@ -119,6 +137,26 @@ const SearchAttributesDialog = ({ chosenAttributes, setChosenAttributes }) => {
           />
         </div>
       ))}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={advancedSearchOnClick}
+        sx={{
+          width: '150px',
+          margin: 'auto',
+          backgroundColor: 'lightpink',
+          borderRadius: '50px',
+          transition: 'all 0.5s ease-in-out', // Adds transition effect
+          '&:hover': {
+            backgroundColor: 'red', // Change to desired hover background color
+            scale: '1.1',
+          },
+        }}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        {hover ? <Search /> : 'Search by Query'}
+      </Button>
     </div>
   );
 };

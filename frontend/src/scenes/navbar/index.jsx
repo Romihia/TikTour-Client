@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import {
   Search,
+  FilterList,
   Settings,
   Message,
   DarkMode,
@@ -75,6 +76,10 @@ const Navbar = () => {
   const fullName = `${user.firstName} ${user.lastName}`;
 
   const searchForUser = async (username) => {
+    if (username === "") {
+      alert("User not found!");
+      return;
+    }
     console.log("searchForUser: ", username);
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${username}/getByUsername`, {
         method: "GET",
@@ -151,6 +156,26 @@ const Navbar = () => {
       alert("An error occurred while searching for posts.");
     }
   };
+
+  const advancedSearchOnClick = async () => {
+    if (showSearchedUsers) {
+      setSearchContent([]);
+      setShowSearchedUsers(false);
+    }
+    else {
+      setSearchType(chosenAttributes.searchType);
+      if (searchType !== undefined) {
+        setSearchType(chosenAttributes.searchType);
+        const { ["searchType"]: _, ...rest } = chosenAttributes;
+        if (searchType === "users")
+          await searchUsersByAttributes(rest);
+        else if (searchType === "posts")
+          await searchPostsByAttributes(rest);
+        setShowSearchedUsers(true);
+      }
+    }
+    setShowSearchAttributes(false);
+  };
   
 
   return (
@@ -189,35 +214,16 @@ const Navbar = () => {
           >
           <div style={{width: 'fit-content'}}>
               <InputBase 
-              placeholder="Search by query..."
+              placeholder="Search by username..."
               onChange={(event) => {
                 setSearchUsername(event.target.value);
               }}
               />
             <IconButton>
-              <Search onClick={async () => {
-                if (showSearchedUsers) {
-                  setSearchContent([]);
-                  setShowSearchedUsers(false);
-                }
-                else {
-                  setSearchType(chosenAttributes.searchType);
-                  if (searchType !== undefined) {
-                    setSearchType(chosenAttributes.searchType);
-                    const { ["searchType"]: _, ...rest } = chosenAttributes;
-                    if (searchType === "users")
-                      await searchUsersByAttributes(rest);
-                    else if (searchType === "posts")
-                      await searchPostsByAttributes(rest);
-                    setShowSearchedUsers(true);
-                  }
-                }
-                setShowSearchAttributes(false);
-              }
-               } />
+              <Search onClick={() => { searchForUser(searchUsername); }} />
             </IconButton>
             <IconButton>
-              <Settings onClick={() => {
+              <FilterList onClick={() => {
                 setSearchContent([]);
                 setShowSearchAttributes(!showSearchAttributes);
                 setShowSearchedUsers(false);
@@ -227,9 +233,10 @@ const Navbar = () => {
           <ul
             style={{
               display: showSearchedUsers ? 'block' : 'none',  // Show or hide the list based on the flag
-              width: '150%',  // Adjust the width as needed
-              borderRadius: '20px',
-              backgroundColor: 'white',
+              width: '100%',  // Adjust the width as needed
+              backgroundColor: 'snow',
+              border: '1px solid gray',
+              borderRadius: '5px',
               listStyle: 'none',  // Remove bullet points
               margin: '0',
               padding: '0',
@@ -237,11 +244,10 @@ const Navbar = () => {
               minHeight: '50vh',  // Ensure the list has a minimum height
               overflowY: 'scroll',  // Enable vertical scrolling
               overflowX: 'hidden',  // Prevent horizontal scrolling
-              border: '2px solid black',
             }}
           >
             {searchContent.map((data, index) => (
-              <li key={index} style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+              <li key={index} >
                 {
                   searchType === "users" ? 
                   <SearchResult isPost={false} data={data} /> : 
@@ -254,8 +260,16 @@ const Navbar = () => {
           </ul>
 
             { showSearchAttributes && 
-            <div>
-             <SearchAttributesDialog chosenAttributes={chosenAttributes} setChosenAttributes={setChosenAttributes}/>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'column',
+            }}>
+             <SearchAttributesDialog 
+                chosenAttributes={chosenAttributes} 
+                setChosenAttributes={setChosenAttributes}
+                advancedSearchOnClick={advancedSearchOnClick} />
             </div>
             }
             
