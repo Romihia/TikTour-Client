@@ -39,6 +39,7 @@ const Navbar = () => {
   const [showSearchedUsers, setShowSearchedUsers] = useState(false);
   const [showSearchAttributes, setShowSearchAttributes] = useState(false);
   const [chosenAttributes, setChosenAttributes] = useState([]);
+  const [filterTitle, setFilterTitle] = useState({});
 
 
 
@@ -53,6 +54,13 @@ const Navbar = () => {
 
   const [searchUsername, setSearchUsername] = useState("");
   const [searchType, setSearchType] = useState("users");
+
+  useEffect(() => {
+    console.log("FiltersTitleChangedTo: " , Object.entries(filterTitle).length > 0);
+    Object.entries(filterTitle).map((filter) => {
+      console.log(filter[0],":",filter[1]);
+    });
+  }, [filterTitle]);
 
   useEffect(() => {
     console.log("Reload");
@@ -124,6 +132,8 @@ const Navbar = () => {
     } catch (err) {
       console.error("Error searching users:", err);
       alert("An error occurred while searching for users.");
+    } finally {
+      return query;
     }
   };
 
@@ -154,6 +164,8 @@ const Navbar = () => {
     } catch (err) {
       console.error("Error searching posts:", err);
       alert("An error occurred while searching for posts.");
+    } finally {
+      return query;
     }
   };
 
@@ -168,9 +180,11 @@ const Navbar = () => {
         setSearchType(chosenAttributes.searchType);
         const { ["searchType"]: _, ...rest } = chosenAttributes;
         if (searchType === "users")
-          await searchUsersByAttributes(rest);
+          setFilterTitle(await searchUsersByAttributes(rest));
         else if (searchType === "posts")
-          await searchPostsByAttributes(rest);
+          setFilterTitle(await searchPostsByAttributes(rest));
+        console.log(2);
+
         setShowSearchedUsers(true);
       }
     }
@@ -246,8 +260,26 @@ const Navbar = () => {
               overflowX: 'hidden',  // Prevent horizontal scrolling
             }}
           >
-            {searchContent.map((data, index) => (
-              <li key={index} >
+            {Object.entries(filterTitle).length > 0 && (
+              <>
+                <span style={{ 
+                  fontWeight: 'bold',
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'center',
+                   }}>Filters:</span>
+
+                <ul>
+                  {
+                  Object.entries(filterTitle).map((filter) => {
+                  return <li>{filter[0]} : {filter[1]}</li>;
+                  })
+                  }
+                </ul>
+              </>
+            )}
+            {searchContent.length > 0 && searchContent.map((data, index) => (
+              <li key={index}>
                 {
                   searchType === "users" ? 
                   <SearchResult isPost={false} data={data} /> : 
@@ -258,6 +290,7 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
+
 
             { showSearchAttributes && 
             <div style={{
