@@ -343,7 +343,7 @@ const Navbar = () => {
 
                 setShowSearchingFiltersHistory(false);
                 setShowSearchAttributes(false);
-                setShowSearchedUsers(true);
+                setShowSearchedUsers(!showSearchedUsers);
                 
               }} />
             </IconButton>
