@@ -13,7 +13,7 @@ import {
 import {
   Search,
   FilterList,
-  Settings,
+  HistoryOutlined,
   Message,
   DarkMode,
   LightMode,
@@ -21,6 +21,7 @@ import {
   Help,
   Menu,
   Close,
+  DeleteOutline,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "state";
@@ -39,8 +40,8 @@ const Navbar = () => {
   const [showSearchedUsers, setShowSearchedUsers] = useState(false);
   const [showSearchAttributes, setShowSearchAttributes] = useState(false);
   const [chosenAttributes, setChosenAttributes] = useState([]);
-  const [filterTitle, setFilterTitle] = useState({});
-
+  const [searchingFiltersHistory, setSearchingFiltersHistory] = useState([]);
+  const [showSearchingFiltersHistory, setShowSearchingFiltersHistory] = useState(false);
 
 
   const token = useSelector((state) => state.token);
@@ -56,17 +57,10 @@ const Navbar = () => {
   const [searchType, setSearchType] = useState("users");
 
   useEffect(() => {
-    console.log("FiltersTitleChangedTo: " , Object.entries(filterTitle).length > 0);
-    Object.entries(filterTitle).map((filter) => {
-      console.log(filter[0],":",filter[1]);
-    });
-  }, [filterTitle]);
-
-  useEffect(() => {
-    console.log("Reload");
     setSearchContent([]);
     setShowSearchedUsers(false);
     setShowSearchAttributes(false);
+    setShowSearchingFiltersHistory(false);
     setChosenAttributes([]);
     setSearchType(searchType || undefined);
     setSearchUsername("");
@@ -88,7 +82,6 @@ const Navbar = () => {
       alert("User not found!");
       return;
     }
-    console.log("searchForUser: ", username);
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${username}/getByUsername`, {
         method: "GET",
         headers: { 
@@ -96,7 +89,6 @@ const Navbar = () => {
         },
       });
       const data = await response.json();
-      console.log("data: ", JSON.stringify(data));
       if (data._id !== "UsernameNotFound") {
       navigate(`/profile/${data._id}`);
       navigate(0);
@@ -105,13 +97,58 @@ const Navbar = () => {
       }
   };
 
+  const getSearchingFiltersHistory = async (userId) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/search/${userId}/getUserSearchingFiltersHistory`, {
+        method: "GET",
+        headers: { 
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update search filters history');
+      }
+      
+      const data = await response.json();
+      setSearchingFiltersHistory(data.result);
+      // Optionally, handle the result here
+    } catch (error) {
+      console.error("Error updating search filters history:", error);
+    }
+  };
+
+  const updateSearchingFiltersHistory = async (newFilterQuery) => {
+    const queryToSend = {...newFilterQuery, _id: user._id};
+    try {
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/search/updateUserSearchingFiltersHistory`, {
+        method: "POST",
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify( queryToSend ), // Assuming you're sending the queryString as the body
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update search filters history');
+      }
+      
+      const result = await response.json();
+      
+      // Optionally, handle the result here
+      console.log("Search filters history updated successfully:", result);
+      
+    } catch (error) {
+      console.error("Error updating search filters history:", error);
+    }
+  };
+
   const searchUsersByAttributes = async (query) => {
     try {
-      console.log("\n\n\n searchForQuery: ", JSON.stringify(query) +"\n\n\n");
       
       // Create query string from the query object
       const queryString = new URLSearchParams(query).toString();
-      console.log("\n\n\n queryString: ", `${process.env.REACT_APP_URL_BACKEND}/search/getUsers?${queryString}`);
       
       // Make the GET request with query parameters
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/search/getUsers?${queryString}`, {
@@ -125,25 +162,27 @@ const Navbar = () => {
       const data = await response.json();
       
       if (data._id !== "UsersNotFound") {
+        console.log(1);
         setSearchContent(data);
+        console.log("\n\nData: ", JSON.stringify(data));
+        console.log("\n\nSearchContent: ", JSON.stringify(searchContent));
+        return true;
       } else {
         alert("Users not found!");
+        return false;
       }
     } catch (err) {
       console.error("Error searching users:", err);
       alert("An error occurred while searching for users.");
-    } finally {
-      return query;
+      return false;
     }
   };
 
   const searchPostsByAttributes = async (query) => {
     try {
-      console.log("\n\n\n searchForQuery: ", JSON.stringify(query) +"\n\n\n");
       
       // Create query string from the query object
       const queryString = new URLSearchParams(query).toString();
-      console.log("\n\n\n queryString: ", `${process.env.REACT_APP_URL_BACKEND}/search/getPosts?${queryString}`);
       
       // Make the GET request with query parameters
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/search/getPosts?${queryString}`, {
@@ -158,14 +197,15 @@ const Navbar = () => {
       
       if (data._id !== "PostsNotFound") {
         setSearchContent(data);
+        return true;
       } else {
         alert("Posts not found!");
+        return false;
       }
     } catch (err) {
       console.error("Error searching posts:", err);
       alert("An error occurred while searching for posts.");
-    } finally {
-      return query;
+      return false;
     }
   };
 
@@ -175,20 +215,84 @@ const Navbar = () => {
       setShowSearchedUsers(false);
     }
     else {
+      let success;
       setSearchType(chosenAttributes.searchType);
       if (searchType !== undefined) {
         setSearchType(chosenAttributes.searchType);
-        const { ["searchType"]: _, ...rest } = chosenAttributes;
         if (searchType === "users")
-          setFilterTitle(await searchUsersByAttributes(rest));
+          success = await searchUsersByAttributes(chosenAttributes);
         else if (searchType === "posts")
-          setFilterTitle(await searchPostsByAttributes(rest));
-        console.log(2);
-
+          success = await searchPostsByAttributes(chosenAttributes);
+        updateSearchingFiltersHistory(chosenAttributes);
+        console.log("searchContent: " + searchContent);
+        console.log("success: " + success);
+        if (!success) {
+          return;
+        }
         setShowSearchedUsers(true);
       }
     }
     setShowSearchAttributes(false);
+    setShowSearchingFiltersHistory(false);
+  };
+  
+  const searchByFreeText = async (freeText) => {
+    try {
+      const query = {"freeText": freeText};
+      // Create query string from the query object
+      const queryString = new URLSearchParams(query).toString();
+      
+      // Make the GET request with query parameters
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/search/getContentByFreeTextSearch?${queryString}`, {
+        method: "GET",
+        headers: { 
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // Get a list of users&posts as data.
+      const data = await response.json();
+      
+      if (data._id !== "ContentNotFound") {
+        console.log("\n\nFoundData: " + JSON.stringify(data));
+        setSearchContent(data);
+        return true;
+      } else {
+        alert("Content not found!");
+        return false;
+      }
+    } catch (err) {
+      console.error("Error searching posts:", err);
+      alert("An error occurred while searching for posts.");
+      return false;
+    }
+  };
+  
+  const removeFilterFromHistory = async (index) => {
+    const queryToSend = { _id: user._id, indexToRemove: index };
+    try {
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/search/removeSearchFilterFromHistory`, {
+        method: "POST",
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(queryToSend), // Sending the updated filters as the body
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to remove search filter from history');
+      }
+  
+      const result = await response.json();
+      
+      // Optionally, handle the result here
+      console.log("Search filters history updated successfully:", result);
+      alert("Filter removed successfully!");
+  
+    } catch (error) {
+      console.error("Error updating search filters history:", error);
+    }
   };
   
 
@@ -228,22 +332,130 @@ const Navbar = () => {
           >
           <div style={{width: 'fit-content'}}>
               <InputBase 
-              placeholder="Search by username..."
+              placeholder="Search by free text..."
               onChange={(event) => {
                 setSearchUsername(event.target.value);
               }}
               />
             <IconButton>
-              <Search onClick={() => { searchForUser(searchUsername); }} />
+              <Search onClick={() => { 
+                searchByFreeText(searchUsername);
+
+                setShowSearchingFiltersHistory(false);
+                setShowSearchAttributes(false);
+                setShowSearchedUsers(true);
+                
+              }} />
             </IconButton>
             <IconButton>
               <FilterList onClick={() => {
                 setSearchContent([]);
                 setShowSearchAttributes(!showSearchAttributes);
                 setShowSearchedUsers(false);
+                setSearchingFiltersHistory(false);
+                setShowSearchingFiltersHistory(false);
                 }}/>
             </IconButton>
+            <IconButton>
+              <HistoryOutlined onClick={() => {
+                getSearchingFiltersHistory(user._id);
+                setShowSearchAttributes(false);
+                setShowSearchedUsers(false);
+                setShowSearchingFiltersHistory(!showSearchingFiltersHistory);
+              }}/>
+            </IconButton>
           </div>
+          
+          <div style={{
+            display: showSearchingFiltersHistory ? 'flex' : 'none',  // Show or hide the list based on the flag
+            flexDirection: 'column',
+            width: '40vw',  // Adjust the width as needed
+            backgroundColor: 'snow',
+            border: '1px solid gray',
+            borderRadius: '5px',
+            margin: '0',
+            padding: '10px',
+            macHeight: '55vh',  // Ensure the list has a minimum height
+            height: 'fit-content',
+          }}>
+            <h2 style={{display: 'block', width: '100%', textAlign: 'center', color: dark }}>Seaching Filters History</h2>
+            <ul
+            style={{
+              display: 'flex',
+              flexDirection: 'column-reverse',
+              width: '100%',  // Adjust the width as needed
+              backgroundColor: 'snow',
+              border: '1px solid gray',
+              borderRadius: '5px',
+              listStyle: 'none',  // Remove bullet points
+              margin: '0',
+              padding: '10px',
+              maxHeight: '40vh',  // Ensure the list has a minimum height
+              overflowY: 'scroll',  // Enable vertical scrolling
+              overflowX: 'hidden',  // Prevent horizontal scrolling
+            }}
+          >
+            {searchingFiltersHistory.length > 0 && searchingFiltersHistory.map((data, index) => (
+              <li 
+              key={index} 
+              style={{
+                position: 'relative',  // Make the `li` element a relative container
+                backgroundColor: 'lightpink',
+                border: '1px solid black',
+                borderRadius: '5px',
+                margin: '0.5rem 0',
+                padding: '0.5rem',
+                cursor: 'pointer',
+                height: 'fit-content',
+                wordWrap: 'break-word',  // Ensure long text wraps within the container
+              }}
+              onClick={async () => {
+                let success;
+                const data = searchingFiltersHistory[index];
+                console.log("\n\n\nData: " + JSON.stringify(data));
+                setSearchContent(data);
+                console.log("\n\nsearchType: ", data.searchType);
+            
+                if (data.searchType === "users")
+                  success = await searchUsersByAttributes(data);
+                else if (data.searchType === "posts")
+                  success = await searchPostsByAttributes(data);
+                console.log("success: ", success);
+                if (!success) return;
+                setShowSearchingFiltersHistory(false);
+                setShowSearchedUsers(true);
+              }}
+            >
+              <div style={{
+                position: 'absolute',  // Position the button absolutely within the `li`
+                top: '0.5rem',  // Adjust as needed
+                right: '0.5rem',  // Adjust as needed
+              }}>
+                <IconButton onClick={(e) => {
+                  e.stopPropagation();  // Prevent click event from triggering the `li` onClick
+                  removeFilterFromHistory(index);
+                  window.location.reload();
+
+                }}>
+                  <DeleteOutline />
+                </IconButton>
+              </div>
+              <div style={{ marginTop: '2rem' }}>  {/* Added marginTop to prevent overlap with the delete button */}
+                {Object.entries(data).map(([key, value]) => (
+                  <div key={key} style={{ marginBottom: '0.25rem' }}>
+                    <strong>{key}:</strong> {String(value)}
+                  </div>
+                ))}
+              </div>
+            </li>
+            
+            ))}
+
+          </ul>
+        </div>
+
+
+          
           <ul
             style={{
               display: showSearchedUsers ? 'block' : 'none',  // Show or hide the list based on the flag
@@ -260,37 +472,18 @@ const Navbar = () => {
               overflowX: 'hidden',  // Prevent horizontal scrolling
             }}
           >
-            {Object.entries(filterTitle).length > 0 && (
-              <>
-                <span style={{ 
-                  fontWeight: 'bold',
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'center',
-                   }}>Filters:</span>
-
-                <ul>
-                  {
-                  Object.entries(filterTitle).map((filter) => {
-                  return <li>{filter[0]} : {filter[1]}</li>;
-                  })
-                  }
-                </ul>
-              </>
-            )}
-            {searchContent.length > 0 && searchContent.map((data, index) => (
-              <li key={index}>
+            {
+              searchContent?.length > 0 && searchContent.map((data, index) => {
+              console.log(`data[${index}]`, data);
+              return <li key={index}>
                 {
-                  searchType === "users" ? 
+                  data.email ? // user
                   <SearchResult isPost={false} data={data} /> : 
-                  searchType === "posts" ? 
-                  <SearchResult isPost={true} data={data} /> : 
-                  null
+                  <SearchResult isPost={true} data={data} />
                 }
-              </li>
-            ))}
+              </li>;
+            })}
           </ul>
-
 
             { showSearchAttributes && 
             <div style={{
