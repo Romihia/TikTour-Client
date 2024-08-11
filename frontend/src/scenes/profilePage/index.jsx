@@ -231,7 +231,7 @@ const ProfilePage = () => {
               <Box m="2rem 0" />
             </>
           )}
-          <PostsWidget userId={userId} isProfile />
+          <PostsWidget userId={userId} isProfile={loggedInUserId === userId} />
         </Box>
       </Box>
       <ChangePasswordDialog

@@ -337,32 +337,32 @@ const Navbar = () => {
                 setSearchUsername(event.target.value);
               }}
               />
-            <IconButton>
-              <Search onClick={() => { 
+            <IconButton onClick={() => { 
                 searchByFreeText(searchUsername);
 
                 setShowSearchingFiltersHistory(false);
                 setShowSearchAttributes(false);
                 setShowSearchedUsers(!showSearchedUsers);
                 
-              }} />
+              }}>
+              <Search />
             </IconButton>
-            <IconButton>
-              <FilterList onClick={() => {
+            <IconButton onClick={() => {
                 setSearchContent([]);
                 setShowSearchAttributes(!showSearchAttributes);
                 setShowSearchedUsers(false);
                 setSearchingFiltersHistory(false);
                 setShowSearchingFiltersHistory(false);
-                }}/>
+                }}>
+              <FilterList />
             </IconButton>
-            <IconButton>
-              <HistoryOutlined onClick={() => {
+            <IconButton onClick={() => {
                 getSearchingFiltersHistory(user._id);
                 setShowSearchAttributes(false);
                 setShowSearchedUsers(false);
                 setShowSearchingFiltersHistory(!showSearchingFiltersHistory);
-              }}/>
+              }}>
+              <HistoryOutlined />
             </IconButton>
           </div>
           
