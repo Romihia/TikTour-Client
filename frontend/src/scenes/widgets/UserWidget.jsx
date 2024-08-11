@@ -59,7 +59,7 @@ const UserWidget = ({ userId, picturePath }) => {
     dateOfBirth,
   } = user;
   
-  const fixedBirthdayDate = dateOfBirth === null ? "No birthday given" : dateOfBirth.slice(0,10);
+  const fixedBirthdayDate = dateOfBirth === null ? "No birthday given" : dateOfBirth?.slice(0,10);
 
   return (
     <WidgetWrapper>
