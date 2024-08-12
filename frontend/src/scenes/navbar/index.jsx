@@ -17,7 +17,6 @@ import {
   Message,
   DarkMode,
   LightMode,
-  Notifications,
   Help,
   Menu,
   Close,
@@ -29,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
 import SearchResult from "./SearchResult";
 import SearchAttributesDialog from "./SearchAttributesDialog";
+import Notifications from "scenes/widgets/Notifications";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -514,7 +514,7 @@ const Navbar = () => {
             )}
           </IconButton>
           {/* <Message sx={{ fontSize: "25px" }} /> */}
-          <Notifications sx={{ fontSize: "25px" }} />
+          <Notifications userId={user._id}/>
           <IconButton onClick={() => navigate("/about")}>
           <Help sx={{ fontSize: "25px" }} />
           </IconButton>
