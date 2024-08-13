@@ -70,6 +70,7 @@ const PostWidget = ({
 
   };
 
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
@@ -116,9 +117,11 @@ const PostWidget = ({
 
 
   const patchLike = async () => {
-    // Add post to saved posts.
-    await saveUnsavePost();
-
+    // If the post is not saved and not liked by the user, call saveUnsavePost
+    if (!isSaved && !isLiked) {
+      await saveUnsavePost();
+    }
+  
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
       method: "PATCH",
       headers: {
@@ -130,6 +133,7 @@ const PostWidget = ({
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
+  
 
   const patchDisike = async () => {
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/dislike`, {
