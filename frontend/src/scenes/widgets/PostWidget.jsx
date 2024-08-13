@@ -5,6 +5,8 @@ import {
   ThumbDownOutlined,
   DeleteOutline,
   EditOutlined,
+  BookmarkBorder,
+  Bookmark
 } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme, InputBase, Button } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
@@ -31,6 +33,7 @@ const PostWidget = ({
   hashtags,
   likes,
   dislikes,
+  isSaved
 }) => {
   
   const sharePost = async (sharedById="") => {
@@ -113,6 +116,9 @@ const PostWidget = ({
 
 
   const patchLike = async () => {
+    // Add post to saved posts.
+    await saveUnsavePost();
+
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
       method: "PATCH",
       headers: {
@@ -137,6 +143,38 @@ const PostWidget = ({
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
+  
+  const saveUnsavePost = async () => {
+  
+    try {
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/save/${loggedInUserId}/${postId}/saveUnsavePost`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      console.log("Response Status: " + response.status);
+  
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error("Failed to save post. Server response:", errorResponse);
+        alert(`Failed to save post: ${errorResponse.message || "Unknown error"}`);
+        return; // Exit the function if the request failed
+      }
+  
+      const data = await response.json();
+      console.log("Success Response:", data);
+  
+      alert(data.message);
+      window.location.reload();
+  
+    } catch (e) {
+      console.error("Failed to save post:", e);
+      alert(`An error occurred: ${e.message}`);
+    }
+  };  
+  
 
   const deletePost = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -237,9 +275,8 @@ const PostWidget = ({
           }} />
       </FlexBetween>
     );
-    return;
-  }
   };
+};
 
   const styles = {
     editBox: {
@@ -259,12 +296,21 @@ const PostWidget = ({
   };
   return (
     <WidgetWrapper m="2rem 0">
-        {sharedById !== ""  && sharedById !== undefined && 
-        <div style={{
+        {
+        <div
+        style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: (sharedById !== ""  && sharedById !== undefined) ? "space-between" : "right",
           alignItems: "center",
           marginBottom: "1rem",
+        }}>
+        <span 
+        onClick={ () => {
+          navigate(`/profile/${sharedById}`);
+          navigate(0);
+        }}
+        style={{
+          display: (sharedById !== ""  && sharedById !== undefined) ? "flex" : "none",
           backgroundColor: palette.primary.main,
           color: 'white',
           width: 'fit-content',
@@ -272,13 +318,23 @@ const PostWidget = ({
           borderRadius: "2rem",
           boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
           cursor: "pointer",
-        }}>
-        <span onClick={ () => {
-          navigate(`/profile/${sharedById}`);
-          navigate(0);
         }}
         >Shared by {sharedByUsername}
         </span>
+        <IconButton onClick={
+          async () => {
+            console.log("\nClicked saveUnsavePost button\n");
+          
+            await saveUnsavePost();
+          }
+        }>
+          {
+          isSaved ?
+          <Bookmark style={{color: palette.primary.main}}/>
+          :
+          <BookmarkBorder/>
+          }
+        </IconButton>
       </div>
       } 
       <Following
@@ -415,6 +471,7 @@ const PostWidget = ({
             }}>
               <ShareOutlined />
             </IconButton>
+
           </FlexBetween>
         </Box>
       )}

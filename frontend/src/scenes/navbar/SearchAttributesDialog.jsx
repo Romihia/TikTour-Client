@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from "@mui/material";
+import { Button, useTheme } from "@mui/material";
 import { 
   PeopleAltOutlined,
   SignpostOutlined,
   Search
  } from "@mui/icons-material";
-
 
 const widgetStyle = {
   padding: '20px',
@@ -54,6 +53,7 @@ const activeButtonStyle = {
 
 const SearchAttributesDialog = ({ chosenAttributes, setChosenAttributes, advancedSearchOnClick }) => {
   const [searchType, setSearchType] = useState('users');
+  const { palette } = useTheme();
 
   useEffect(() => {
     console.log("chosen attributes: " + JSON.stringify(chosenAttributes));
@@ -138,9 +138,9 @@ const SearchAttributesDialog = ({ chosenAttributes, setChosenAttributes, advance
         </div>
       ))}
       <Button
-        variant="contained"
-        color="primary"
         onClick={advancedSearchOnClick}
+        variant='contained'
+        color= 'primary'
         sx={{
           width: '150px',
           margin: 'auto',
@@ -148,7 +148,7 @@ const SearchAttributesDialog = ({ chosenAttributes, setChosenAttributes, advance
           borderRadius: '50px',
           transition: 'all 0.5s ease-in-out', // Adds transition effect
           '&:hover': {
-            backgroundColor: 'red', // Change to desired hover background color
+            backgroundColor: palette.primary.main, // Change to desired hover background color
             scale: '1.1',
           },
         }}
