@@ -16,7 +16,7 @@ import { setFollowing } from "state";
 import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
 import ProfileEdit from 'scenes/profilePage/ProfileEdit';
 
-const ProfilePage = () => {
+const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
   const following = useSelector((state) => state.user.following || []);
@@ -34,16 +34,19 @@ const ProfilePage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [openProfileEdit, setOpenProfileEdit] = useState(false);
+  const { palette } = useTheme();
 
 
   const buttonStyle = {
     width: '60%',
     margin: '5px',
     border: '2px groove black',
+    backgroundColor: '#f8f8f8', // Change to desired hover background color
     borderRadius: '50px',
     transition: 'all 0.2s ease-in-out', // Adds transition effect
     '&:hover': {
-      backgroundColor: 'red', // Change to desired hover background color
+      backgroundColor: palette.primary.main, // Change to desired hover background color
+      color: 'white',
       scale: '1.1'
     },
   };
@@ -168,12 +171,11 @@ const ProfilePage = () => {
             startIcon={isFollowing ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
           >
             {isFollowing ? "Unfollow" : "Follow"}
-          </Button>
+           </Button>
           
           )}
           <Box m="2rem 0" />
           {loggedInUserId === userId && (
-
               <div style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -182,25 +184,43 @@ const ProfilePage = () => {
                 width: '100%',
                 margin: '20px 0'
               }}>
+                {
+                showOnlySaved ?
+
                 <Button
-                  variant="contained"
-                  color="primary"
+                  sx={buttonStyle}
+                  onClick={() => {
+                    setShowOnlySaved(false);
+                  }
+                  }
+                >
+                  Watch My Posts
+                </Button>
+                :
+                <Button
+                  sx={buttonStyle}
+                  onClick={() => {
+                    setShowOnlySaved(true);
+                  }
+                  }
+                >
+                  Watch Saved
+                </Button>
+                }
+
+                <Button
                   onClick={deleteAccount}
                   sx={buttonStyle}
                 >
                   Delete Account
                 </Button>
                 <Button
-                  variant="contained"
-                  color="primary"
                   onClick={() => setOpenPasswordDialog(true)}
                   sx={buttonStyle}
                 >
                   Change Password
                 </Button>
                 <Button
-                  variant="contained"
-                  color="primary"
                   onClick={editAccount}
                   sx={buttonStyle}
                 >
@@ -231,7 +251,7 @@ const ProfilePage = () => {
               <Box m="2rem 0" />
             </>
           )}
-          <PostsWidget userId={userId} isProfile={loggedInUserId === userId} />
+          <PostsWidget userId={userId} isProfile={loggedInUserId === userId} onlySaved={showOnlySaved}/>
         </Box>
       </Box>
       <ChangePasswordDialog

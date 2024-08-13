@@ -339,7 +339,6 @@ const Navbar = () => {
               />
             <IconButton onClick={() => { 
                 searchByFreeText(searchUsername);
-
                 setShowSearchingFiltersHistory(false);
                 setShowSearchAttributes(false);
                 setShowSearchedUsers(!showSearchedUsers);

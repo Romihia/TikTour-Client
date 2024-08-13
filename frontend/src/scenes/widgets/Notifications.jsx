@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import { IconButton, Menu, MenuItem, useTheme } from '@mui/material';
 import { Notifications as NotificationIcon } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 
@@ -8,6 +8,7 @@ export default function Notifications({userId}) {
   const [notifications, setNotifications] = useState([]);
   const token = useSelector((state) => state.token);
   const state = useSelector((state) => state);
+  const { palette } = useTheme();
 
   useEffect(() => {
     getNotifications();
@@ -115,7 +116,7 @@ export default function Notifications({userId}) {
   {
     position: 'relative',
     padding: '10px',
-    color: 'red'
+    color: palette.primary.main
   } : 
   {
     padding: '10px',
@@ -125,7 +126,7 @@ export default function Notifications({userId}) {
     position: 'absolute',
     top: '-5px',
     right: '-5px',
-    backgroundColor: 'red',
+    backgroundColor: palette.primary.main,
     color: 'white',
     borderRadius: '50%',
     width: '20px',
@@ -150,9 +151,13 @@ export default function Notifications({userId}) {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
+        style={{
+          border: '1px groove black'
+        }}
       >
         <div style={{
           display: 'flex',
+          width: '20vw',
 
         }}>
           <b style={{
@@ -163,7 +168,9 @@ export default function Notifications({userId}) {
           }}>
             Notification Center
           </b>
-          <button onClick={clearNotifications}>Clear</button>
+          <button onClick={clearNotifications} style={{
+            cursor: 'pointer',
+          }}>Clear</button>
         </div>
         {notifications.length > 0 ? (
           notifications.map((notification, notificationIndex) => (
