@@ -49,6 +49,7 @@ const MyPostWidget = ({ picturePath }) => {
   const medium = palette.neutral.medium;
 
   const handlePost = async () => {
+    try{
     const formData = {
       userId: _id,
       sharedById: "",
@@ -71,18 +72,22 @@ const MyPostWidget = ({ picturePath }) => {
     });
 
     let posts = await response.json();
+    alert("The post was posted successfully!");
     window.location.reload();
 
     // Sort posts by createdAt in descending order
     posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    dispatch(setPosts({ posts }));
-    setImage(null);
-    setPost("");
-    setLocation(""); // Reset location after posting
-    setAddedLocation(false);
-    setHashtagsList([]); // Clear the hashtags list
-    alert("The post was posted successfully!");
-    window.location.reload();
+    // dispatch(setPosts({ posts }));
+    // setImage(null);
+    // setPost("");
+    // setLocation(""); // Reset location after posting
+    // setAddedLocation(false);
+    // setHashtagsList([]); // Clear the hashtags list
+    // alert("The post was posted successfully!");
+    // window.location.reload();
+  }
+  catch(error){
+  }
 
   };
 
