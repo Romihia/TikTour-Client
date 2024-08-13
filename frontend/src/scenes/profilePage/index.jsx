@@ -15,6 +15,8 @@ import TopLikerWidget from "scenes/widgets/TopLikerWidget";
 import { setFollowing } from "state";
 import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
 import ProfileEdit from 'scenes/profilePage/ProfileEdit';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
@@ -107,8 +109,20 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        alert('Account deleted successfully');
-        navigate('/login');
+        toast.success("Account deleted successfully!", {
+          position: 'top-center',
+          autoClose: 1000, // Toast duration set to 1 second
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        
+        // Delay the navigation to the login page until after the toast is displayed
+        setTimeout(() => {
+          navigate('/login');
+        }, 1000); // 1 second delay
+        
       } catch (error) {
         console.error('Error during account deletion:', error);
       }
@@ -135,12 +149,25 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       if (!response.ok) {
         throw new Error('Old password is incorrect');
       }
-
-      alert('Password changed successfully');
+      toast.success("Password changed successfully!", {
+        position: 'top-center',
+        autoClose: 1000, // Toast duration set to 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       setOpenPasswordDialog(false);
     } catch (error) {
       console.error('Error during password change:',error);
-      alert(error);
+      toast.error("Error during password change", {
+        position: 'top-center',
+        autoClose: 1500, // Toast duration set to 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 

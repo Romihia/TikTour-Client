@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 import PostWidget from "./PostWidget";
-import { ShowerOutlined } from "@mui/icons-material";
+
 
 const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
   const dispatch = useDispatch();

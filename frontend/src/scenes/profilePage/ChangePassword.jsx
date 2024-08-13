@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from '@mui/material';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ChangePasswordDialog = ({ open, onClose, onChangePassword, oldPassword, setOldPassword,
 newPassword, setNewPassword, confirmNewPassword, setConfirmNewPassword }) => {
 
   const handleChangePassword = () => {
     if (newPassword !== confirmNewPassword) {
-      alert('New passwords do not match.');
+      toast.error("New passwords don't match!", {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return;
     }
     onChangePassword(oldPassword, newPassword);

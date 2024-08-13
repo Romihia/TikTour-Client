@@ -12,12 +12,17 @@ import { Box, IconButton, Typography, useTheme, InputBase, Button } from "@mui/m
 import FlexBetween from "components/FlexBetween";
 import Following from "components/Following";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
 import Dropzone from "react-dropzone";
 import HashtagsTextField from "./HashtagsTextField";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import DeleteModal from '../../components/DeleteConfirmation';
+
+
 
 import { getPosts, setPosts } from "state";
 
@@ -35,7 +40,8 @@ const PostWidget = ({
   dislikes,
   isSaved
 }) => {
-  
+
+
   const sharePost = async (sharedById="") => {
     const formData = {
       userId: postUserId,
@@ -65,8 +71,19 @@ const PostWidget = ({
     posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     dispatch(setPosts({ posts }));
     
-    alert("The post was posted successfully!");
-    window.location.reload();
+    toast.success("The post was shared successfully!", {
+      position: 'top-center',
+      autoClose: 800,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+    
+    // Delay the reload until after the toast has been shown for 0.5 seconds
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
 
   };
 
@@ -163,22 +180,48 @@ const PostWidget = ({
       if (!response.ok) {
         const errorResponse = await response.json();
         console.error("Failed to save post. Server response:", errorResponse);
-        alert(`Failed to save post: ${errorResponse.message || "Unknown error"}`);
+        toast.error("Failed to save post!", {
+          position: 'top-center',
+          autoClose: 1000, // Toast duration set to 1 second
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         return; // Exit the function if the request failed
       }
   
       const data = await response.json();
       console.log("Success Response:", data);
   
-      alert(data.message);
-      window.location.reload();
+      
+      toast.success(data.message, {
+        position: 'top-center',
+        autoClose: 1000, // Toast duration set to 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 500); // 0.5 second delay
   
     } catch (e) {
       console.error("Failed to save post:", e);
-      alert(`An error occurred: ${e.message}`);
+      toast.error("An error occurred!", {
+        position: 'top-center',
+        autoClose: 1000, // Toast duration set to 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };  
   
+  const [showModal, setShowModal] = useState(false);
 
   const deletePost = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -191,10 +234,28 @@ const PostWidget = ({
       });
       if (response.ok) {
         dispatch(setPost({ post: await response.json() }));
-        window.location.reload();
-        alert("Post deleted successfully");
+        toast.success("Post deleted successfully!", {
+          position: 'top-center',
+          autoClose: 800, 
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 800); 
+        
+
       } else {
-        alert("Failed to delete post");
+        toast.error("Failed to delete post!", {
+          position: 'top-center',
+          autoClose: 1000, 
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     }
   };
@@ -210,7 +271,14 @@ const PostWidget = ({
     };
 
     if (editLocation.trim() === "") {
-      alert("Location can't be empty!");
+      toast.error("Location can't be empty!", {
+        position: 'top-right',
+        autoClose: 800, 
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return;
     }
     
@@ -245,7 +313,14 @@ const PostWidget = ({
     setEditDescription(editDescription);
     setEditLocation(editLocation); // Reset location after posting
     setEditHashtags(editHashtags); // Clear the hashtags list
-    alert("The post was edited successfully!");
+    toast.success("The post was edited successfully!", {
+      position: 'top-right',
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
   };
   const renderImagePreview = () => {
     if (isEditing) {
@@ -279,7 +354,7 @@ const PostWidget = ({
           }} />
       </FlexBetween>
     );
-  };
+  }
 };
 
   const styles = {

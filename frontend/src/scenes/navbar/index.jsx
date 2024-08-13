@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   Box,
   IconButton,
@@ -79,7 +81,14 @@ const Navbar = () => {
 
   const searchForUser = async (username) => {
     if (username === "") {
-      alert("User not found!");
+      toast.error("User not found!", {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return;
     }
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${username}/getByUsername`, {
@@ -93,7 +102,14 @@ const Navbar = () => {
       navigate(`/profile/${data._id}`);
       navigate(0);
       } else {
-      alert("User not found!");
+      toast.error("User not found!", {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       }
   };
 
@@ -168,12 +184,26 @@ const Navbar = () => {
         console.log("\n\nSearchContent: ", JSON.stringify(searchContent));
         return true;
       } else {
-        alert("Users not found!");
+        toast.error("Users not found!", {
+          position: 'top-center',
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         return false;
       }
     } catch (err) {
       console.error("Error searching users:", err);
-      alert("An error occurred while searching for users.");
+      toast.error("An error occurred while searching for users.", {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return false;
     }
   };
@@ -199,12 +229,26 @@ const Navbar = () => {
         setSearchContent(data);
         return true;
       } else {
-        alert("Posts not found!");
+        toast.error("Posts not found!", {
+          position: 'top-center',
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         return false;
       }
     } catch (err) {
       console.error("Error searching posts:", err);
-      alert("An error occurred while searching for posts.");
+      toast.error("An error occurred while searching for posts.", {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return false;
     }
   };
@@ -258,12 +302,26 @@ const Navbar = () => {
         setSearchContent(data);
         return true;
       } else {
-        alert("Content not found!");
+        toast.error("Content not found!", {
+          position: 'top-center',
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         return false;
       }
     } catch (err) {
       console.error("Error searching posts:", err);
-      alert("An error occurred while searching for posts.");
+      toast.error("An error occurred while searching for posts.", {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return false;
     }
   };
@@ -288,7 +346,14 @@ const Navbar = () => {
       
       // Optionally, handle the result here
       console.log("Search filters history updated successfully:", result);
-      alert("Filter removed successfully!");
+      toast.success("Filter removed successfully!", {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
   
     } catch (error) {
       console.error("Error updating search filters history:", error);

@@ -17,6 +17,8 @@ import { themeSettings } from "./theme";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode"; 
 import { setLogout } from "./state";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -71,6 +73,7 @@ function App() {
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
+      <ToastContainer />
     </div>
   );
 }

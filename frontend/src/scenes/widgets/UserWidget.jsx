@@ -1,5 +1,4 @@
 import {
-  ManageAccountsOutlined,
   LocationOnOutlined,
   StarOutlined,
 } from "@mui/icons-material";

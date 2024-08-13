@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LocationAutocomplete = ({ onSelectLocation }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -12,7 +14,14 @@ const LocationAutocomplete = ({ onSelectLocation }) => {
     if (selectedLocation.trim() !== "")
       onSelectLocation(selectedLocation); // Pass the selectedLocation to the parent component
     else {
-      alert("Location can't be empty!");
+      toast.error("Location can't be empty!", {
+        position: 'top-center',
+        autoClose: 1000, // Toast duration set to 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
