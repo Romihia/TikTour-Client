@@ -20,7 +20,7 @@ import HashtagsTextField from "./HashtagsTextField";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import DeleteModal from '../../components/DeleteConfirmation';
+import DeleteModal from "components/DeleteConfirmation";
 
 
 
@@ -73,7 +73,7 @@ const PostWidget = ({
     
     toast.success("The post was shared successfully!", {
       position: 'top-center',
-      autoClose: 800,
+      autoClose: 700,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -83,8 +83,7 @@ const PostWidget = ({
     // Delay the reload until after the toast has been shown for 0.5 seconds
     setTimeout(() => {
       window.location.reload();
-    }, 500);
-
+    }, 750);
   };
 
 
@@ -197,7 +196,7 @@ const PostWidget = ({
       
       toast.success(data.message, {
         position: 'top-center',
-        autoClose: 1000, // Toast duration set to 1 second
+        autoClose: 700, // Toast duration set to 1 second
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -206,7 +205,7 @@ const PostWidget = ({
       
       setTimeout(() => {
         window.location.reload();
-      }, 500); // 0.5 second delay
+      }, 750); // 0.5 second delay
   
     } catch (e) {
       console.error("Failed to save post:", e);
@@ -223,41 +222,48 @@ const PostWidget = ({
   
   const [showModal, setShowModal] = useState(false);
 
+  const handleDeletePost = () => {
+    setShowModal(true);
+  };
+  
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+  
   const deletePost = async () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.ok) {
+      dispatch(setPost({ post: await response.json() }));
+      toast.success("Post deleted successfully!", {
+        position: 'top-center',
+        autoClose: 700, 
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
       });
-      if (response.ok) {
-        dispatch(setPost({ post: await response.json() }));
-        toast.success("Post deleted successfully!", {
-          position: 'top-center',
-          autoClose: 800, 
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-        setTimeout(() => {
-          window.location.reload();
-        }, 800); 
-        
+      setTimeout(() => {
+        window.location.reload();
+      }, 750); 
+      
 
-      } else {
-        toast.error("Failed to delete post!", {
-          position: 'top-center',
-          autoClose: 1000, 
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-      }
+    } else {
+      toast.error("Failed to delete post!", {
+        position: 'top-center',
+        autoClose: 1000, 
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
+    handleCloseModal(); 
   };
 
   const editPost = async () => {
@@ -530,11 +536,16 @@ const PostWidget = ({
             </FlexBetween>
             <FlexBetween gap="1rem">
               {(loggedInUserId === postUserId || loggedInUserId === sharedById) && (
-                <IconButton onClick={deletePost}>
+                <IconButton onClick={handleDeletePost}>
                   <DeleteOutline sx={{ color: primary }} />
                 </IconButton>
               )}
             </FlexBetween>
+            <DeleteModal 
+              show={showModal} 
+              handleClose={handleCloseModal} 
+              handleConfirm={deletePost} 
+            />            
             <FlexBetween gap="1rem">
               {loggedInUserId === postUserId && (
                 <IconButton onClick={() => setIsEditing(true)}>

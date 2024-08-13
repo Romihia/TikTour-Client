@@ -71,10 +71,9 @@ const MyPostWidget = ({ picturePath }) => {
 
 
     let posts = await response.json();
-    window.location.reload();
     toast.success("The post was posted successfully!", {
       position: 'top-center',
-      autoClose: 500,
+      autoClose: 700,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -82,9 +81,9 @@ const MyPostWidget = ({ picturePath }) => {
     });
     
     //Delay the reload until after the toast has been shown for 0.5 seconds
-    // setTimeout(() => {
-    //   window.location.reload();
-    // }, 200);
+    setTimeout(() => {
+      window.location.reload();
+    }, 750);
     
 
     // Sort posts by createdAt in descending order

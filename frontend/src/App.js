@@ -19,6 +19,7 @@ import { jwtDecode } from "jwt-decode";
 import { setLogout } from "./state";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const mode = useSelector((state) => state.mode);
