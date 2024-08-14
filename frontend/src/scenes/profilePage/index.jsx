@@ -148,16 +148,20 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
 
       if (!response.ok) {
         throw new Error('Old password is incorrect');
+      }else{
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+        toast.success("Password changed successfully!", {
+          position: 'top-center',
+          autoClose: 1000, // Toast duration set to 1 second
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        setOpenPasswordDialog(false);
       }
-      toast.success("Password changed successfully!", {
-        position: 'top-center',
-        autoClose: 1000, // Toast duration set to 1 second
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-      setOpenPasswordDialog(false);
     } catch (error) {
       console.error('Error during password change:',error);
       toast.error("Error during password change", {
