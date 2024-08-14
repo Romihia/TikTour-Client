@@ -17,6 +17,7 @@ import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
 import ProfileEdit from 'scenes/profilePage/ProfileEdit';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { setLogout } from "state";
 
 const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
@@ -99,6 +100,9 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
     const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
     if (confirmed) {
       try {
+        dispatch(setLogout());
+        navigate('/login');
+        
         const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`, {
           method: "DELETE",
           headers: {
@@ -118,11 +122,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
           draggable: true,
         });
         
-        // Delay the navigation to the login page until after the toast is displayed
-        setTimeout(() => {
-          navigate('/login');
-        }, 1000); // 1 second delay
-        
+
       } catch (error) {
         console.error('Error during account deletion:', error);
       }
