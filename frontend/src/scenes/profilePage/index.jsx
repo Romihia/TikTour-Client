@@ -296,7 +296,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
               <Box m="2rem 0" />
             </>
           )}
-          <PostsWidget userId={userId} isProfile={loggedInUserId === userId} onlySaved={showOnlySaved}/>
+          <PostsWidget userId={userId} isProfile={true} onlySaved={showOnlySaved}/>
         </Box>
       </Box>
       <ChangePasswordDialog
