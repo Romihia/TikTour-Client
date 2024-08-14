@@ -41,7 +41,6 @@ const PostWidget = ({
   isSaved
 }) => {
 
-
   const sharePost = async (sharedById="") => {
     const formData = {
       userId: postUserId,

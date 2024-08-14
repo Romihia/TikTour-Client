@@ -1,13 +1,39 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "state";
+import state, { setPosts } from "state";
 import PostWidget from "./PostWidget";
 
+const handleLikePost = async (postId) => {
+  const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId: userId }), 
+  });
+  const updatedPost = await response.json();
+  dispatch(setPosts({ posts: posts.map(post => post._id === postId ? updatedPost : post) }));
+};
+
+const handleDislikePost = async (postId) => {
+  const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/dislike`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId: userId }), 
+  });
+  const updatedPost = await response.json();
+  dispatch(setPosts({ posts: posts.map(post => post._id === postId ? updatedPost : post) }));
+};
 
 const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
   const token = useSelector((state) => state.token);
+  const loggedInUserId = useSelector((state) => state.user._id);
   const [savedPosts, setSavedPosts] = useState([]);
 
   const getUserAndFollowingPosts = async () => {
@@ -35,7 +61,7 @@ const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
 
   const initializeSavedPosts = async () => {
     const response = await fetch(
-      `${process.env.REACT_APP_URL_BACKEND}/save/${userId}/getSavedPosts`,
+      `${process.env.REACT_APP_URL_BACKEND}/save/${loggedInUserId}/getSavedPosts`,
       {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
@@ -58,33 +84,6 @@ const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
     }
   }, [userId, isProfile, onlySaved, dispatch, token]); // Add dispatch and token to dependency array
  
-
-  const handleLikePost = async (postId) => {
-    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: userId }), 
-    });
-    const updatedPost = await response.json();
-    dispatch(setPosts({ posts: posts.map(post => post._id === postId ? updatedPost : post) }));
-  };
-
-  const handleDislikePost = async (postId) => {
-    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/dislike`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: userId }), 
-    });
-    const updatedPost = await response.json();
-    dispatch(setPosts({ posts: posts.map(post => post._id === postId ? updatedPost : post) }));
-  };
-
   return (
     <div>
       <ul style={{ display: 'flex', flexDirection: isProfile ? 'column-reverse' : 'column' }}>
@@ -134,3 +133,4 @@ const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
 };
 
 export default PostsWidget;
+export { handleLikePost, handleDislikePost };

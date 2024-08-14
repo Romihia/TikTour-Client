@@ -44,7 +44,9 @@ const Navbar = () => {
   const [chosenAttributes, setChosenAttributes] = useState([]);
   const [searchingFiltersHistory, setSearchingFiltersHistory] = useState([]);
   const [showSearchingFiltersHistory, setShowSearchingFiltersHistory] = useState(false);
-
+  const [savedPosts, setSavedPosts] = useState([]);
+  const loggedInUserId = useSelector((state) => state.user._id);
+  const [reloader, setReloader] = useState(true);
 
   const token = useSelector((state) => state.token);
 
@@ -76,6 +78,25 @@ const Navbar = () => {
   useEffect(() => {
     setSearchType(chosenAttributes.searchType);
   }, [chosenAttributes]);
+
+  useEffect(() => {
+    initializeSavedPosts();
+  }, []);
+
+  const initializeSavedPosts = async () => {
+    const response = await fetch(
+      `${process.env.REACT_APP_URL_BACKEND}/save/${loggedInUserId}/getSavedPosts`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await response.json();
+    const savedPosts = data.savedPosts;
+    setSavedPosts(savedPosts);
+  };
+
+  
 
   const fullName = `${user.firstName} ${user.lastName}`;
 
@@ -360,6 +381,10 @@ const Navbar = () => {
     }
   };
   
+  const reloadSearch = async () => {
+    searchByFreeText(searchUsername);
+    window.location.reload();
+  };
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -536,14 +561,14 @@ const Navbar = () => {
               overflowX: 'hidden',  // Prevent horizontal scrolling
             }}
           >
-            {
+            { reloader &&
               searchContent?.length > 0 && searchContent.map((data, index) => {
               console.log(`data[${index}]`, data);
               return <li key={index}>
                 {
                   data.email ? // user
-                  <SearchResult isPost={false} data={data} /> : 
-                  <SearchResult isPost={true} data={data} />
+                  <SearchResult savedPosts={savedPosts} isPost={false} data={data} /> : 
+                  <SearchResult savedPosts={savedPosts} isPost={true} data={data} />
                 }
               </li>;
             })}

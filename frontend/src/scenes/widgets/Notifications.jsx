@@ -11,7 +11,7 @@ export default function Notifications({userId}) {
   const token = useSelector((state) => state.token);
   const state = useSelector((state) => state);
   const { palette } = useTheme();
-  const navigate = useNavigate();t
+  const navigate = useNavigate();
 
   useEffect(() => {
     getNotifications();
