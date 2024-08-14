@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import {
   EditOutlined,
   DeleteOutlined,
-  AttachFileOutlined,
-  GifBoxOutlined,
   ImageOutlined,
-  MicOutlined,
-  MoreHorizOutlined,
   LocationOnOutlined,
   TagOutlined,
 } from "@mui/icons-material";
@@ -26,13 +22,15 @@ import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
 import LocationAutocomplete from "./LocationAutocomplete";
 import HashtagsTextField from "./HashtagsTextField";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 
 const MyPostWidget = ({ picturePath }) => {
   const [hashtagsList, setHashtagsList] = useState([]);
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [location, setLocation] = useState(""); // Location state
   const [addedLocation, setAddedLocation] = useState(false);
@@ -49,6 +47,7 @@ const MyPostWidget = ({ picturePath }) => {
   const medium = palette.neutral.medium;
 
   const handlePost = async () => {
+    try{
     const formData = {
       userId: _id,
       sharedById: "",
@@ -70,19 +69,35 @@ const MyPostWidget = ({ picturePath }) => {
       body: JSON.stringify(formData),
     });
 
+
     let posts = await response.json();
-    window.location.reload();
+    toast.success("The post was posted successfully!", {
+      position: 'top-center',
+      autoClose: 700,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+    
+    //Delay the reload until after the toast has been shown for 0.5 seconds
+    setTimeout(() => {
+      window.location.reload();
+    }, 750);
+    
 
     // Sort posts by createdAt in descending order
     posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    dispatch(setPosts({ posts }));
-    setImage(null);
-    setPost("");
-    setLocation(""); // Reset location after posting
-    setAddedLocation(false);
-    setHashtagsList([]); // Clear the hashtags list
-    alert("The post was posted successfully!");
-    window.location.reload();
+    // dispatch(setPosts({ posts }));
+    // setImage(null);
+    // setPost("");
+    // setLocation(""); // Reset location after posting
+    // setAddedLocation(false);
+    // setHashtagsList([]); // Clear the hashtags list
+    // window.location.reload();
+  }
+  catch(error){
+  }
 
   };
 

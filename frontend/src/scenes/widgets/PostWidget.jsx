@@ -5,17 +5,24 @@ import {
   ThumbDownOutlined,
   DeleteOutline,
   EditOutlined,
+  BookmarkBorder,
+  Bookmark
 } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme, InputBase, Button } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import Following from "components/Following";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
 import Dropzone from "react-dropzone";
 import HashtagsTextField from "./HashtagsTextField";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import DeleteModal from "components/DeleteConfirmation";
+
+
 
 import { getPosts, setPosts } from "state";
 
@@ -31,8 +38,10 @@ const PostWidget = ({
   hashtags,
   likes,
   dislikes,
+  isSaved
 }) => {
-  
+
+
   const sharePost = async (sharedById="") => {
     const formData = {
       userId: postUserId,
@@ -62,10 +71,21 @@ const PostWidget = ({
     posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     dispatch(setPosts({ posts }));
     
-    alert("The post was posted successfully!");
-    window.location.reload();
-
+    toast.success("The post was shared successfully!", {
+      position: 'top-center',
+      autoClose: 700,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+    
+    // Delay the reload until after the toast has been shown for 0.5 seconds
+    setTimeout(() => {
+      window.location.reload();
+    }, 750);
   };
+
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -113,6 +133,11 @@ const PostWidget = ({
 
 
   const patchLike = async () => {
+    // If the post is not saved and not liked by the user, call saveUnsavePost
+    if (!isSaved && !isLiked) {
+      await saveUnsavePost();
+    }
+  
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/like`, {
       method: "PATCH",
       headers: {
@@ -124,6 +149,7 @@ const PostWidget = ({
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
+  
 
   const patchDisike = async () => {
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/dislike`, {
@@ -137,24 +163,107 @@ const PostWidget = ({
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
-
-  const deletePost = async () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}`, {
-        method: "DELETE",
+  
+  const saveUnsavePost = async () => {
+  
+    try {
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/save/${loggedInUserId}/${postId}/saveUnsavePost`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
         },
       });
-      if (response.ok) {
-        dispatch(setPost({ post: await response.json() }));
-        window.location.reload();
-        alert("Post deleted successfully");
-      } else {
-        alert("Failed to delete post");
+  
+      console.log("Response Status: " + response.status);
+  
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        console.error("Failed to save post. Server response:", errorResponse);
+        toast.error("Failed to save post!", {
+          position: 'top-center',
+          autoClose: 1000, // Toast duration set to 1 second
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        return; // Exit the function if the request failed
       }
+  
+      const data = await response.json();
+      console.log("Success Response:", data);
+  
+      
+      toast.success(data.message, {
+        position: 'top-center',
+        autoClose: 700, // Toast duration set to 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 750); // 0.5 second delay
+  
+    } catch (e) {
+      console.error("Failed to save post:", e);
+      toast.error("An error occurred!", {
+        position: 'top-center',
+        autoClose: 1000, // Toast duration set to 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
+  };  
+  
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDeletePost = () => {
+    setShowModal(true);
+  };
+  
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+  
+  const deletePost = async () => {
+    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.ok) {
+      dispatch(setPost({ post: await response.json() }));
+      toast.success("Post deleted successfully!", {
+        position: 'top-center',
+        autoClose: 700, 
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 750); 
+      
+
+    } else {
+      toast.error("Failed to delete post!", {
+        position: 'top-center',
+        autoClose: 1000, 
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+    handleCloseModal(); 
   };
 
   const editPost = async () => {
@@ -167,6 +276,18 @@ const PostWidget = ({
       "picturePath": editImage ? editImage : picturePath, // If no new image is provided, use the original picturePath
     };
 
+    if (editLocation.trim() === "") {
+      toast.error("Location can't be empty!", {
+        position: 'top-right',
+        autoClose: 800, 
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      return;
+    }
+    
     console.log("Edit Description: ", editDescription);
     console.log("Edit Location: ", editLocation);
     console.log("Edit Hashtags: ", editHashtags);
@@ -198,7 +319,14 @@ const PostWidget = ({
     setEditDescription(editDescription);
     setEditLocation(editLocation); // Reset location after posting
     setEditHashtags(editHashtags); // Clear the hashtags list
-    alert("The post was edited successfully!");
+    toast.success("The post was edited successfully!", {
+      position: 'top-right',
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
   };
   const renderImagePreview = () => {
     if (isEditing) {
@@ -232,9 +360,8 @@ const PostWidget = ({
           }} />
       </FlexBetween>
     );
-    return;
   }
-  };
+};
 
   const styles = {
     editBox: {
@@ -254,12 +381,21 @@ const PostWidget = ({
   };
   return (
     <WidgetWrapper m="2rem 0">
-        {sharedById !== ""  && sharedById !== undefined && 
-        <div style={{
+        {
+        <div
+        style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: (sharedById !== ""  && sharedById !== undefined) ? "space-between" : "right",
           alignItems: "center",
           marginBottom: "1rem",
+        }}>
+        <span 
+        onClick={ () => {
+          navigate(`/profile/${sharedById}`);
+          navigate(0);
+        }}
+        style={{
+          display: (sharedById !== ""  && sharedById !== undefined) ? "flex" : "none",
           backgroundColor: palette.primary.main,
           color: 'white',
           width: 'fit-content',
@@ -267,13 +403,23 @@ const PostWidget = ({
           borderRadius: "2rem",
           boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
           cursor: "pointer",
-        }}>
-        <span onClick={ () => {
-          navigate(`/profile/${sharedById}`);
-          navigate(0);
         }}
         >Shared by {sharedByUsername}
         </span>
+        <IconButton onClick={
+          async () => {
+            console.log("\nClicked saveUnsavePost button\n");
+          
+            await saveUnsavePost();
+          }
+        }>
+          {
+          isSaved ?
+          <Bookmark style={{color: palette.primary.main}}/>
+          :
+          <BookmarkBorder/>
+          }
+        </IconButton>
       </div>
       } 
       <Following
@@ -390,11 +536,16 @@ const PostWidget = ({
             </FlexBetween>
             <FlexBetween gap="1rem">
               {(loggedInUserId === postUserId || loggedInUserId === sharedById) && (
-                <IconButton onClick={deletePost}>
+                <IconButton onClick={handleDeletePost}>
                   <DeleteOutline sx={{ color: primary }} />
                 </IconButton>
               )}
             </FlexBetween>
+            <DeleteModal 
+              show={showModal} 
+              handleClose={handleCloseModal} 
+              handleConfirm={deletePost} 
+            />            
             <FlexBetween gap="1rem">
               {loggedInUserId === postUserId && (
                 <IconButton onClick={() => setIsEditing(true)}>
@@ -410,6 +561,7 @@ const PostWidget = ({
             }}>
               <ShareOutlined />
             </IconButton>
+
           </FlexBetween>
         </Box>
       )}

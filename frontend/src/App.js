@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "scenes/homePage";
 import LoginPage from "scenes/loginPage";
@@ -17,6 +17,9 @@ import { themeSettings } from "./theme";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode"; 
 import { setLogout } from "./state";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -50,6 +53,8 @@ function App() {
 
   const isAuth = Boolean(token);
 
+  const [showOnlySaved, setShowOnlySaved] = useState(false);
+
   return (
     <div className="app">
       <BrowserRouter>
@@ -60,7 +65,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/home" element={isAuth ? <HomePage /> : <Navigate to="/" />} />
-            <Route path="/profile/:userId" element={isAuth ? <ProfilePage /> : <Navigate to="/" />} />
+            <Route path="/profile/:userId" element={isAuth ? <ProfilePage showOnlySaved={showOnlySaved} setShowOnlySaved={setShowOnlySaved} /> : <Navigate to="/" />} />
             <Route path="/about" element={isAuth ? <AboutPage /> : <Navigate to="/" />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
@@ -69,6 +74,7 @@ function App() {
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
+      <ToastContainer />
     </div>
   );
 }

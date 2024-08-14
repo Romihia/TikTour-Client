@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 import PostWidget from "./PostWidget";
 
-const PostsWidget = ({ userId, isProfile = false }) => {
+
+const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts);
   const token = useSelector((state) => state.token);
+  const [savedPosts, setSavedPosts] = useState([]);
 
   const getUserAndFollowingPosts = async () => {
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/userAndFollowing/${userId}`, {
@@ -31,13 +33,30 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     dispatch(setPosts({ posts: data }));
   };
 
+  const initializeSavedPosts = async () => {
+    const response = await fetch(
+      `${process.env.REACT_APP_URL_BACKEND}/save/${userId}/getSavedPosts`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await response.json();
+    const savedPosts = data.savedPosts;
+    setSavedPosts(savedPosts);
+  };
+
   useEffect(() => {
-    if (isProfile) {
+    initializeSavedPosts();
+    if (onlySaved) {
+      dispatch(setPosts({ posts: savedPosts }));
+    }
+    else if (isProfile) {
       getUserPosts();
     } else {
       getUserAndFollowingPosts();
     }
-  }, [userId, isProfile, dispatch, token]); // Add dispatch and token to dependency array
+  }, [userId, isProfile, onlySaved, dispatch, token]); // Add dispatch and token to dependency array
  
 
   const handleLikePost = async (postId) => {
@@ -69,8 +88,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   return (
     <div>
       <ul style={{ display: 'flex', flexDirection: isProfile ? 'column-reverse' : 'column' }}>
-        {posts.map(
-          ({
+        {posts.map((post) => {
+          const {
             _id,
             userId,
             sharedById,
@@ -82,7 +101,12 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             hashtags,
             likes,
             dislikes,
-          }) => (
+          } = post;
+  
+          // Check if the post is saved by checking if the post ID exists in savedPosts
+          const isSaved = savedPosts.some(savedPost => savedPost._id === _id);
+  
+          return (
             <PostWidget
               key={_id}
               postId={_id}
@@ -98,12 +122,14 @@ const PostsWidget = ({ userId, isProfile = false }) => {
               dislikes={dislikes}
               onLike={() => handleLikePost(_id)}
               onDislike={() => handleDislikePost(_id)}
+              isSaved={isSaved}
             />
-          )
-        )}
+          );
+        })}
       </ul>
     </div>
   );
+  
 
 };
 

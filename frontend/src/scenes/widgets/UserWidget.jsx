@@ -1,5 +1,4 @@
 import {
-  ManageAccountsOutlined,
   LocationOnOutlined,
   StarOutlined,
 } from "@mui/icons-material";
@@ -87,7 +86,6 @@ const UserWidget = ({ userId, picturePath }) => {
             </Typography>
           </Box>
         </FlexBetween>
-        <ManageAccountsOutlined />
       </FlexBetween>
 
       <Divider />

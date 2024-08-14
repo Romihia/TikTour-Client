@@ -14,11 +14,15 @@ import TotalLikesWidget from "scenes/widgets/TotalLikesWidget";
 import TopLikerWidget from "scenes/widgets/TopLikerWidget";
 import { setFollowing } from "state";
 import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
+import ProfileEdit from 'scenes/profilePage/ProfileEdit';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { setLogout } from "state";
 
-const ProfilePage = () => {
+const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
-  const following = useSelector((state) => state.user.following || []);
   const { userId } = useParams();
+  const following = useSelector((state) => state.user.following || []);
   const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -32,7 +36,25 @@ const ProfilePage = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [openProfileEdit, setOpenProfileEdit] = useState(false);
+  const { palette } = useTheme();
 
+
+  const buttonStyle = {
+    width: '60%',
+    margin: '5px',
+    border: '2px groove black',
+    backgroundColor: '#f8f8f8', // Change to desired hover background color
+    borderRadius: '50px',
+    transition: 'all 0.2s ease-in-out', // Adds transition effect
+    '&:hover': {
+      backgroundColor: palette.primary.main, // Change to desired hover background color
+      color: 'white',
+      scale: '1.1'
+    },
+  };
+
+  
   const getUser = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${userId}`, {
@@ -78,6 +100,9 @@ const ProfilePage = () => {
     const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
     if (confirmed) {
       try {
+        dispatch(setLogout());
+        navigate('/login');
+        
         const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`, {
           method: "DELETE",
           headers: {
@@ -88,14 +113,25 @@ const ProfilePage = () => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        alert('Account deleted successfully');
-        navigate('/login');
+        toast.success("Account deleted successfully!", {
+          position: 'top-center',
+          autoClose: 1000, // Toast duration set to 1 second
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        
+
       } catch (error) {
         console.error('Error during account deletion:', error);
       }
     }
   };
+  const editAccount = async () => {
+      setOpenProfileEdit(true);
 
+  };
   const passwordChange = async (oldPassword, newPassword) => {
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/password`, {
@@ -112,13 +148,30 @@ const ProfilePage = () => {
 
       if (!response.ok) {
         throw new Error('Old password is incorrect');
+      }else{
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+        toast.success("Password changed successfully!", {
+          position: 'top-center',
+          autoClose: 1000, // Toast duration set to 1 second
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        setOpenPasswordDialog(false);
       }
-
-      alert('Password changed successfully');
-      setOpenPasswordDialog(false);
     } catch (error) {
       console.error('Error during password change:',error);
-      alert(error);
+      toast.error("Error during password change", {
+        position: 'top-center',
+        autoClose: 1500, // Toast duration set to 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
@@ -149,34 +202,71 @@ const ProfilePage = () => {
             startIcon={isFollowing ? <PersonRemoveOutlined /> : <PersonAddOutlined />}
           >
             {isFollowing ? "Unfollow" : "Follow"}
-          </Button>
+           </Button>
           
           )}
           <Box m="2rem 0" />
           {loggedInUserId === userId && (
-            <>
-              <Button
-                variant="contained"
-                color="error"
-                onClick={deleteAccount}
-                sx={{ mt: "1rem" }}
-              >
-                Delete Account
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setOpenPasswordDialog(true)}
-                sx={{ mt: "1rem", ml: "1rem" }}
-              >
-                Change Password
-              </Button>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                margin: '20px 0'
+              }}>
+                {
+                showOnlySaved ?
+
+                <Button
+                  sx={buttonStyle}
+                  onClick={() => {
+                    setShowOnlySaved(false);
+                  }
+                  }
+                >
+                  Watch My Posts
+                </Button>
+                :
+                <Button
+                  sx={buttonStyle}
+                  onClick={() => {
+                    setShowOnlySaved(true);
+                  }
+                  }
+                >
+                  Watch Saved
+                </Button>
+                }
+
+                <Button
+                  onClick={deleteAccount}
+                  sx={buttonStyle}
+                >
+                  Delete Account
+                </Button>
+                <Button
+                  onClick={() => setOpenPasswordDialog(true)}
+                  sx={buttonStyle}
+                >
+                  Change Password
+                </Button>
+                <Button
+                  onClick={editAccount}
+                  sx={buttonStyle}
+                >
+                  Edit Account
+                </Button>
+
+              </div>
+            )}
+          {loggedInUserId === userId && (
+            <div>
               <FollowersWidget userId={userId} />
               <Box m="2rem 0" />
               <FollowingWidget userId={userId} />
-            </>
+              <Box m="2rem 0" /></div>
           )}
-          <Box m="2rem 0" />
           <TotalLikesWidget userId={userId} />
           <Box m="2rem 0" />
           <TopLikerWidget userId={userId} />
@@ -192,7 +282,7 @@ const ProfilePage = () => {
               <Box m="2rem 0" />
             </>
           )}
-          <PostsWidget userId={userId} isProfile />
+          <PostsWidget userId={userId} isProfile={loggedInUserId === userId} onlySaved={showOnlySaved}/>
         </Box>
       </Box>
       <ChangePasswordDialog
@@ -206,9 +296,14 @@ const ProfilePage = () => {
         confirmNewPassword={confirmNewPassword}
         setConfirmNewPassword={setConfirmNewPassword}
       />
+      {openProfileEdit && (
+        <ProfileEdit
+          open={openProfileEdit}
+          onClose={() => setOpenProfileEdit(false)}
+        />
+      )}
     </Box>
   );
 };
 
 export default ProfilePage;
-
