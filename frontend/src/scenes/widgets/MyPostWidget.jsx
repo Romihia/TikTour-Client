@@ -74,7 +74,7 @@ const MyPostWidget = ({ picturePath }) => {
     toast.success("The post was posted successfully!", {
       position: 'top-center',
       autoClose: 700,
-      hideProgressBar: false,
+      hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,

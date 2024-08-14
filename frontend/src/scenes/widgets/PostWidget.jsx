@@ -74,7 +74,7 @@ const PostWidget = ({
     toast.success("The post was shared successfully!", {
       position: 'top-center',
       autoClose: 700,
-      hideProgressBar: false,
+      hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
@@ -182,7 +182,7 @@ const PostWidget = ({
         toast.error("Failed to save post!", {
           position: 'top-center',
           autoClose: 1000, // Toast duration set to 1 second
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -197,7 +197,7 @@ const PostWidget = ({
       toast.success(data.message, {
         position: 'top-center',
         autoClose: 700, // Toast duration set to 1 second
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -212,7 +212,7 @@ const PostWidget = ({
       toast.error("An error occurred!", {
         position: 'top-center',
         autoClose: 1000, // Toast duration set to 1 second
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -243,7 +243,7 @@ const PostWidget = ({
       toast.success("Post deleted successfully!", {
         position: 'top-center',
         autoClose: 700, 
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -257,7 +257,7 @@ const PostWidget = ({
       toast.error("Failed to delete post!", {
         position: 'top-center',
         autoClose: 1000, 
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -278,9 +278,9 @@ const PostWidget = ({
 
     if (editLocation.trim() === "") {
       toast.error("Location can't be empty!", {
-        position: 'top-right',
+        position: 'top-center',
         autoClose: 800, 
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -320,9 +320,9 @@ const PostWidget = ({
     setEditLocation(editLocation); // Reset location after posting
     setEditHashtags(editHashtags); // Clear the hashtags list
     toast.success("The post was edited successfully!", {
-      position: 'top-right',
+      position: 'top-center',
       autoClose: 1000,
-      hideProgressBar: false,
+      hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,

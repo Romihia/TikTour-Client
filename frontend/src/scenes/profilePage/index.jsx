@@ -18,6 +18,8 @@ import ProfileEdit from 'scenes/profilePage/ProfileEdit';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { setLogout } from "state";
+import DeleteModal from "components/DeleteConfirmation";
+
 
 const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
@@ -54,6 +56,15 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
     },
   };
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDeleteAccount = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
   
   const getUser = async () => {
     try {
@@ -97,12 +108,8 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   };
 
   const deleteAccount = async () => {
-    const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (confirmed) {
       try {
         dispatch(setLogout());
-        navigate('/login');
-        
         const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`, {
           method: "DELETE",
           headers: {
@@ -116,17 +123,17 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
         toast.success("Account deleted successfully!", {
           position: 'top-center',
           autoClose: 1000, // Toast duration set to 1 second
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
         });
-        
+
 
       } catch (error) {
         console.error('Error during account deletion:', error);
       }
-    }
+
   };
   const editAccount = async () => {
       setOpenProfileEdit(true);
@@ -155,7 +162,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
         toast.success("Password changed successfully!", {
           position: 'top-center',
           autoClose: 1000, // Toast duration set to 1 second
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -167,7 +174,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       toast.error("Error during password change", {
         position: 'top-center',
         autoClose: 1500, // Toast duration set to 1 second
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -235,16 +242,23 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
                   }
                   }
                 >
-                  Watch Saved
+                  Watch Saved & Liked
                 </Button>
                 }
-
                 <Button
-                  onClick={deleteAccount}
                   sx={buttonStyle}
+                  onClick={() => {
+                    handleDeleteAccount();
+                  }
+                  }
                 >
-                  Delete Account
+                Delete My Account
                 </Button>
+                <DeleteModal
+                  show={showModal}
+                  handleClose={handleCloseModal}
+                  handleConfirm={deleteAccount}
+                />
                 <Button
                   onClick={() => setOpenPasswordDialog(true)}
                   sx={buttonStyle}

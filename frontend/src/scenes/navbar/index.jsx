@@ -84,7 +84,7 @@ const Navbar = () => {
       toast.error("User not found!", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -105,7 +105,7 @@ const Navbar = () => {
       toast.error("User not found!", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -187,7 +187,7 @@ const Navbar = () => {
         toast.error("Users not found!", {
           position: 'top-center',
           autoClose: 1000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -199,7 +199,7 @@ const Navbar = () => {
       toast.error("An error occurred while searching for users.", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -232,7 +232,7 @@ const Navbar = () => {
         toast.error("Posts not found!", {
           position: 'top-center',
           autoClose: 1000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -244,7 +244,7 @@ const Navbar = () => {
       toast.error("An error occurred while searching for posts.", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -305,7 +305,7 @@ const Navbar = () => {
         toast.error("Content not found!", {
           position: 'top-center',
           autoClose: 1000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -317,7 +317,7 @@ const Navbar = () => {
       toast.error("An error occurred while searching for posts.", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -349,7 +349,7 @@ const Navbar = () => {
       toast.success("Filter removed successfully!", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
