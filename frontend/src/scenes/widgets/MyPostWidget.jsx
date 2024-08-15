@@ -17,14 +17,13 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
-import Dropzone from "react-dropzone";
 import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
 import LocationAutocomplete from "./LocationAutocomplete";
 import HashtagsTextField from "./HashtagsTextField";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import ImageDropzone from "components/ImageDropzone";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 
@@ -34,7 +33,7 @@ const MyPostWidget = ({ picturePath }) => {
   const [isImage, setIsImage] = useState(false);
   const [location, setLocation] = useState(""); // Location state
   const [addedLocation, setAddedLocation] = useState(false);
-  const [image, setImage] = useState(null);
+  const [postImagesList, setPostImagesList] = useState([]);
   const [post, setPost] = useState("");
   const [showLocationAutocomplete, setShowLocationAutocomplete] = useState(false); // To toggle autocomplete display
   const [showHashtagsTextField, setShowHashtagsTextField] = useState(false);
@@ -56,8 +55,8 @@ const MyPostWidget = ({ picturePath }) => {
       formData.append("hashtags", hashtagsList); // Convert hashtags array to string
   
       // Append each image to the FormData object
-      if (image && image.length > 0) {
-        image.forEach((img, index) => {
+      if (postImagesList && postImagesList.length > 0) {
+        postImagesList.forEach((img, index) => {
           formData.append("pictures", img); // Add images to the 'pictures' field
         });
       }
@@ -122,68 +121,10 @@ const MyPostWidget = ({ picturePath }) => {
         </FlexBetween>
       </FlexBetween>
       {isImage && (
-        <Box
-          border={`1px solid ${medium}`}
-          borderRadius="5px"
-          mt="1rem"
-          p="1rem"
-        >
-        <Dropzone
-          acceptedFiles=".jpg,.jpeg,.png"
-          multiple={true} // Allow multiple files
-          onDrop={(acceptedFiles) => setImage((prevImages) => [...prevImages, ...acceptedFiles])} // Append new images to the existing array
-        >
-          {({ getRootProps, getInputProps }) => (
-            <Box>
-              <Box
-                {...getRootProps()}
-                border={`2px dashed ${palette.primary.main}`}
-                p="1rem"
-                width="100%"
-                sx={{ "&:hover": { cursor: "pointer" } }}
-              >
-                <input {...getInputProps()} />
-                <p>Add Images Here</p>
-              </Box>
-          
-              {/* Display the images */}
-              <Box sx={{ marginTop: "1rem" }}>
-                {image && image.length > 0 ? (
-                  image.map((img, idx) => (
-                    <Box
-                      key={idx}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginBottom: "10px",
-                        border: "1px solid lightgray",
-                        padding: "10px",
-                        borderRadius: "8px",
-                      }}
-                    >
-                      <img
-                        src={URL.createObjectURL(img)} // Create preview for the image
-                        alt={`preview-${idx}`}
-                        style={{ width: "100px", height: "100px", borderRadius: "8px" }}
-                      />
-                      <IconButton
-                        onClick={() => {
-                          setImage(image.filter((_, i) => i !== idx)); // Remove image from list
-                        }}
-                      >
-                        <DeleteOutlined />
-                      </IconButton>
-                    </Box>
-                  ))
-                ) : (
-                  <p>No Images Added</p>
-                )}
-              </Box>
-            </Box>
-          )}
-        </Dropzone>
-        </Box>
+        <Box>
+        <h1>Upload Your Images</h1>
+        <ImageDropzone images={postImagesList} setImages={setPostImagesList} maxImages={10} size="150px" />
+      </Box>
       )}
 
       <Box>
