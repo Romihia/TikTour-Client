@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -29,7 +29,6 @@ import { setPosts } from "state";
 
 const MyPostWidget = ({ picturePath }) => {
   const [hashtagsList, setHashtagsList] = useState([]);
-  //const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [location, setLocation] = useState(""); // Location state
   const [addedLocation, setAddedLocation] = useState(false);
@@ -44,6 +43,14 @@ const MyPostWidget = ({ picturePath }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
+
+  const textAreaRef = useRef(null);
+
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.scrollLeft = 10; // Move scroll pane 10 pixels to the right
+    }
+  }, [post]); // This effect runs whenever the post text changes
 
   const handlePost = async () => {
     try {
@@ -69,7 +76,6 @@ const MyPostWidget = ({ picturePath }) => {
       body: formData,
     });
 
-
     let posts = await response.json();
     toast.success("The post was posted successfully!", {
       position: 'top-center',
@@ -84,69 +90,72 @@ const MyPostWidget = ({ picturePath }) => {
     setTimeout(() => {
       window.location.reload();
     }, 750);
-    //posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
   } catch (error) {
     console.error("Error uploading post:", error);
   }
 };
 
+
+
   return (
     <WidgetWrapper>
       <FlexBetween gap="1.5rem">
-  <UserImage image={picturePath} />
-  <FlexBetween
-    sx={{
-      flexDirection: 'column', // Arrange children in a column
-      alignItems: 'flex-start', // Align children to start of the cross-axis (horizontal alignment)
-      width: '100%' // Ensure the container takes full width
-    }}
-  >
-    <b style={{ color: mediumMain }}>
-      <span style={{ color: 'red' }}>* </span>
-      Description
-    </b>
-    <textarea
-      placeholder="What's on your mind..."
-      onChange={(e) => setPost(e.target.value)}
-      value={post}
-      style={{
-        width: '100%', // Full width of the container
-        backgroundColor: palette.neutral.light,
-        minHeight: '80px',
-        borderRadius: '2rem',
-        padding: '1rem 2rem',
-        marginTop: '0.5rem', // Add some spacing between the label and the textarea
-        border: 'none', // Optional: removes default border
-        resize: 'vertical', // Allows the user to resize vertically
-        overflow: 'auto', // Allows for scrolling if the content exceeds the visible area
-        fontFamily: 'inherit', // Ensures consistent font styling with the rest of the UI
-        boxSizing: 'border-box' // Ensures padding is included in the width and height
-      }}
-    />
-  </FlexBetween>
-</FlexBetween>
+        <UserImage image={picturePath} />
+        <FlexBetween
+          sx={{
+            flexDirection: 'column', // Arrange children in a column
+            alignItems: 'flex-start', // Align children to start of the cross-axis (horizontal alignment)
+            width: '100%' // Ensure the container takes full width
+          }}
+        >
+          <b style={{ color: mediumMain }}>
+            <span style={{ color: 'red' }}>* </span>
+            Description
+          </b>
+          <textarea
+  ref={textAreaRef} // Add ref to access the DOM element
+  placeholder="What's on your mind..."
+  onChange={(e) => setPost(e.target.value)}
+  value={post}
+  style={{
+    width: '100%', // Full width of the container
+    backgroundColor: palette.neutral.light,
+    minHeight: '80px',
+    borderRadius: '1rem', // Adjust the border radius
+    padding: '1rem 1.5rem', // Adequate padding for text and scroll
+    marginTop: '0.5rem', // Spacing between the label and the textarea
+    border: 'none', // Removes the default border
+    resize: 'vertical', // Allows the user to resize vertically
+    overflow: 'auto', // Enables scrolling
+    fontFamily: 'inherit', // Ensures consistent font styling with the rest of the UI
+    boxSizing: 'border-box', // Ensures padding is included in the width and height
+  }}
+/>
+
+        </FlexBetween>
+      </FlexBetween>
 
       {isImage && (
         <Box>
-        <h1>Upload Your Images</h1>
-        <ImageDropzone images={postImagesList} setImages={setPostImagesList} maxImages={10} size="150px" />
-      </Box>
+          <h1>Upload Your Images</h1>
+          <ImageDropzone images={postImagesList} setImages={setPostImagesList} maxImages={10} size="150px" />
+        </Box>
       )}
 
       <Box>
         {addedLocation &&
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0.5rem',
-          borderRadius: '5px',
-          fontWeight: 'bold',
-          width: 'fit-content'
-        }}>
-          <LocationOnOutlined />
-          <p style={{ color: 'red', marginRight: '5px' }}>Location: </p>
-          <p>{location}</p>
-        </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0.5rem',
+            borderRadius: '5px',
+            fontWeight: 'bold',
+            width: 'fit-content'
+          }}>
+            <LocationOnOutlined />
+            <p style={{ color: 'red', marginRight: '5px' }}>Location: </p>
+            <p>{location}</p>
+          </div>
         }
         {showLocationAutocomplete && (
           <LocationAutocomplete
@@ -186,7 +195,7 @@ const MyPostWidget = ({ picturePath }) => {
             sx={{ "&:hover": { cursor: "pointer", color: medium } }}
           >
             <b>
-            Image
+              Image
             </b>
           </Typography>
         </FlexBetween>
