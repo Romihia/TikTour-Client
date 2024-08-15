@@ -52,7 +52,7 @@ const MyPostWidget = ({ picturePath }) => {
       formData.append("sharedById", "");
       formData.append("description", post);
       formData.append("location", location);
-      formData.append("hashtags", JSON.stringify(hashtagsList)); // Convert hashtags array to string
+      formData.append("hashtags", hashtagsList); // Convert hashtags array to string
         
       // Append each image to the FormData object
       if (postImagesList && postImagesList.length > 0) {
