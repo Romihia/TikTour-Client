@@ -128,43 +128,61 @@ const MyPostWidget = ({ picturePath }) => {
           mt="1rem"
           p="1rem"
         >
-          <Dropzone
-            acceptedFiles=".jpg,.jpeg,.png"
-            multiple={true} // Allow multiple files
-            onDrop={(acceptedFiles) => setImage(acceptedFiles)} // Set images as an array
-          >
-            {({ getRootProps, getInputProps }) => (
-              <FlexBetween>
-                <Box
-                  {...getRootProps()}
-                  border={`2px dashed ${palette.primary.main}`}
-                  p="1rem"
-                  width="100%"
-                  sx={{ "&:hover": { cursor: "pointer" } }}
-                >
-                  <input {...getInputProps()} />
-                  {!image || image.length === 0 ? (
-                    <p>Add Images Here</p>
-                  ) : (
-                    image.map((img, idx) => (
-                      <FlexBetween key={idx}>
-                        <Typography>{img.name}</Typography>
-                        <EditOutlined />
-                      </FlexBetween>
-                    ))
-                  )}
-                </Box>
-                {image && image.length > 0 && (
-                  <IconButton
-                    onClick={() => setImage(null)}
-                    sx={{ width: "15%" }}
-                  >
-                    <DeleteOutlined />
-                  </IconButton>
+        <Dropzone
+          acceptedFiles=".jpg,.jpeg,.png"
+          multiple={true} // Allow multiple files
+          onDrop={(acceptedFiles) => setImage((prevImages) => [...prevImages, ...acceptedFiles])} // Append new images to the existing array
+        >
+          {({ getRootProps, getInputProps }) => (
+            <Box>
+              <Box
+                {...getRootProps()}
+                border={`2px dashed ${palette.primary.main}`}
+                p="1rem"
+                width="100%"
+                sx={{ "&:hover": { cursor: "pointer" } }}
+              >
+                <input {...getInputProps()} />
+                <p>Add Images Here</p>
+              </Box>
+          
+              {/* Display the images */}
+              <Box sx={{ marginTop: "1rem" }}>
+                {image && image.length > 0 ? (
+                  image.map((img, idx) => (
+                    <Box
+                      key={idx}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: "10px",
+                        border: "1px solid lightgray",
+                        padding: "10px",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <img
+                        src={URL.createObjectURL(img)} // Create preview for the image
+                        alt={`preview-${idx}`}
+                        style={{ width: "100px", height: "100px", borderRadius: "8px" }}
+                      />
+                      <IconButton
+                        onClick={() => {
+                          setImage(image.filter((_, i) => i !== idx)); // Remove image from list
+                        }}
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+                    </Box>
+                  ))
+                ) : (
+                  <p>No Images Added</p>
                 )}
-              </FlexBetween>
-            )}
-          </Dropzone>
+              </Box>
+            </Box>
+          )}
+        </Dropzone>
         </Box>
       )}
 
