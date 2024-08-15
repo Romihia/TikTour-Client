@@ -17,14 +17,13 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
-import Dropzone from "react-dropzone";
 import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
 import LocationAutocomplete from "./LocationAutocomplete";
 import HashtagsTextField from "./HashtagsTextField";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import ImageDropzone from "components/ImageDropzone";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 
@@ -34,7 +33,7 @@ const MyPostWidget = ({ picturePath }) => {
   const [isImage, setIsImage] = useState(false);
   const [location, setLocation] = useState(""); // Location state
   const [addedLocation, setAddedLocation] = useState(false);
-  const [image, setImage] = useState(null);
+  const [postImagesList, setPostImagesList] = useState([]);
   const [post, setPost] = useState("");
   const [showLocationAutocomplete, setShowLocationAutocomplete] = useState(false); // To toggle autocomplete display
   const [showHashtagsTextField, setShowHashtagsTextField] = useState(false);
@@ -47,26 +46,27 @@ const MyPostWidget = ({ picturePath }) => {
   const medium = palette.neutral.medium;
 
   const handlePost = async () => {
-    try{
-    const formData = {
-      userId: _id,
-      sharedById: "",
-      description: post,
-      location,
-      hashtags: hashtagsList,
-    };
-
-    if (image) {
-      formData["picturePath"] = image.name;
-    }
-
-    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
-      method: "POST",
-      headers: { 
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+    try {
+      const formData = new FormData(); // Create a FormData object
+      formData.append("userId", _id);
+      formData.append("sharedById", "");
+      formData.append("description", post);
+      formData.append("location", location);
+      formData.append("hashtags", JSON.stringify(hashtagsList)); // Convert hashtags array to string
+        
+      // Append each image to the FormData object
+      if (postImagesList && postImagesList.length > 0) {
+        postImagesList.forEach((img, index) => {
+          formData.append("pictures", img); // Add images to the 'pictures' field
+        });
+      }
+  
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
+        method: "POST",
+        headers: { 
+          Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(formData),
+      body: formData,
     });
 
 
@@ -84,22 +84,11 @@ const MyPostWidget = ({ picturePath }) => {
     setTimeout(() => {
       window.location.reload();
     }, 750);
-    
-
-    // Sort posts by createdAt in descending order
-    posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    // dispatch(setPosts({ posts }));
-    // setImage(null);
-    // setPost("");
-    // setLocation(""); // Reset location after posting
-    // setAddedLocation(false);
-    // setHashtagsList([]); // Clear the hashtags list
-    // window.location.reload();
+    //posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
+  } catch (error) {
+    console.error("Error uploading post:", error);
   }
-  catch(error){
-  }
-
-  };
+};
 
   return (
     <WidgetWrapper>
@@ -132,48 +121,10 @@ const MyPostWidget = ({ picturePath }) => {
         </FlexBetween>
       </FlexBetween>
       {isImage && (
-        <Box
-          border={`1px solid ${medium}`}
-          borderRadius="5px"
-          mt="1rem"
-          p="1rem"
-        >
-          <Dropzone
-            acceptedFiles=".jpg,.jpeg,.png"
-            multiple={false}
-            onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
-          >
-            {({ getRootProps, getInputProps }) => (
-              <FlexBetween>
-                <Box
-                  {...getRootProps()}
-                  border={`2px dashed ${palette.primary.main}`}
-                  p="1rem"
-                  width="100%"
-                  sx={{ "&:hover": { cursor: "pointer" } }}
-                >
-                  <input {...getInputProps()} />
-                  {!image ? (
-                    <p>Add Image Here</p>
-                  ) : (
-                    <FlexBetween>
-                      <Typography>{image.name}</Typography>
-                      <EditOutlined />
-                    </FlexBetween>
-                  )}
-                </Box>
-                {image && (
-                  <IconButton
-                    onClick={() => setImage(null)}
-                    sx={{ width: "15%" }}
-                  >
-                    <DeleteOutlined />
-                  </IconButton>
-                )}
-              </FlexBetween>
-            )}
-          </Dropzone>
-        </Box>
+        <Box>
+        <h1>Upload Your Images</h1>
+        <ImageDropzone images={postImagesList} setImages={setPostImagesList} maxImages={10} size="150px" />
+      </Box>
       )}
 
       <Box>

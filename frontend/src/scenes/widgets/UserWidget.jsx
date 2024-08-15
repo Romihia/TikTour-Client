@@ -56,8 +56,9 @@ const UserWidget = ({ userId, picturePath }) => {
     location,
     username,
     dateOfBirth,
+    picturePath: userPicturePath, // Ensure you fetch the picturePath from the backend as well
   } = user;
-  
+
   const fixedBirthdayDate = dateOfBirth === null ? "No birthday given" : dateOfBirth.slice(0,10);
 
   return (
@@ -69,7 +70,7 @@ const UserWidget = ({ userId, picturePath }) => {
         onClick={() => navigate(`/profile/${userId}`)}
       >
         <FlexBetween gap="1rem">
-          <UserImage image={picturePath} />
+          <UserImage image={userPicturePath || picturePath} />
           <Box>
             <Typography
               variant="h4"
