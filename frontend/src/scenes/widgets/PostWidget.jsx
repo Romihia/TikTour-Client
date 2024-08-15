@@ -15,13 +15,14 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
-import Dropzone from "react-dropzone";
 import HashtagsTextField from "./HashtagsTextField";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import DeleteModal from "components/DeleteConfirmation";
-
+import PostImagesDisplay from "components/PostImagesDisplay";
+import { AddPhotoAlternateOutlined } from "@mui/icons-material";
+import ImageDropzone from "components/ImageDropzone";
 
 
 import { getPosts, setPosts } from "state";
@@ -109,7 +110,7 @@ const PostWidget = ({
   const [editLocation, setEditLocation] = useState(location);
 
   const [sharedByUsername, setSharedByUsername] = useState("");
-
+  
   useEffect(() => {
     const fetchSharedByUsername = async () => {
       if (sharedById) {
@@ -267,15 +268,43 @@ const PostWidget = ({
   };
 
   const editPost = async () => {
-    const formData = {
-      "id": postId,
-      "userId": postUserId,
-      "description": editDescription,
-      "location": editLocation,
-      "hashtags": editHashtags,
-      "picturePath": editImage ? editImage : picturePath, // If no new image is provided, use the original picturePath
-    };
+    const formData = new FormData(); // Use FormData to handle file uploads and JSON data together
+    formData.append("id", postId);
+    formData.append("userId", postUserId);
+    formData.append("description", editDescription);
+    formData.append("location", editLocation);
+    formData.append("hashtags", editHashtags);
+    // Initialize arrays to store new images to upload and images to remove
+    const imagesToRemove = [];
+    const newImages = [];
+    console.log("click editPost");
+    // Compare `editImage` and `picturePath`
+    const editImageSet = new Set(editImage.map(img => (typeof img === "string" ? img : img.name))); // Store image URLs or names of the images in `editImage`
+    const picturePathSet = new Set(picturePath.map(img => img)); // Store image URLs from `picturePath`
 
+    // Find images to remove
+    picturePath.forEach((existingImage) => {
+      if (!editImageSet.has(existingImage)) {
+        imagesToRemove.push(existingImage);
+      }
+    });
+
+    // Find new images to upload
+    editImage.forEach((image) => {
+      if (typeof image !== "string" && !picturePathSet.has(image.name)) {
+        newImages.push(image);
+      }
+    });
+
+    // Add images to remove to the formData
+    imagesToRemove.forEach((imageUrl) => formData.append("imagesToRemove", imageUrl));
+
+    // Add new images to the formData
+    if (newImages && newImages.length > 0) {
+      newImages.forEach((file) => formData.append("pictures", file));
+    }
+    console.log(newImages);
+    console.log(imagesToRemove);
     if (editLocation.trim() === "") {
       toast.error("Location can't be empty!", {
         position: 'top-center',
@@ -287,35 +316,26 @@ const PostWidget = ({
       });
       return;
     }
-    
-    console.log("Edit Description: ", editDescription);
-    console.log("Edit Location: ", editLocation);
-    console.log("Edit Hashtags: ", editHashtags);
-    console.log("Edit Image: ", editImage);
-
-    console.log(JSON.stringify(formData));
-
+    // Perform the request
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}/edit`, {
       method: "PATCH",
       headers: { 
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-     },
-      body: JSON.stringify(formData),
-    }
-    );
-
+        Authorization: `Bearer ${token}`, // Do not set Content-Type, let the browser handle it
+      },
+      body: formData,
+    });
+  
     const editedPost = await response.json();
     
-    console.log("Edited post description: " + editedPost);
+    console.log("Edited post description: ", editedPost);
     
     let newPostList = getPosts();
     console.log("newPostList: ", newPostList);
     
     dispatch(setPost({ post: editedPost }));
-
+  
     setIsEditing(false);
-    setEditImage(editImage);
+    setEditImage(editImage); // Reset image state
     setEditDescription(editDescription);
     setEditLocation(editLocation); // Reset location after posting
     setEditHashtags(editHashtags); // Clear the hashtags list
@@ -328,40 +348,74 @@ const PostWidget = ({
       draggable: true,
     });
   };
-  const renderImagePreview = () => {
-    if (isEditing) {
-      if (!editImage) {
-        return <p>Add Image Here</p>;
-      }
-
-      const imageUrl = typeof editImage === "string" ? `${process.env.REACT_APP_URL_BACKEND}/assets/${editImage}` : URL.createObjectURL(editImage);
-
-      return (
-        <FlexBetween>
-          <Typography>{editImage.name || editImage}</Typography>
-          <img src={imageUrl} alt="preview" style={{ width: "30%", height: "auto", borderRadius: "0.75rem", marginTop: "0.75rem" }} />
-        </FlexBetween>
-      );
-  } else {
-    if (!editImage) {
-      return;
-    }
-
-    const imageUrl = typeof editImage === "string" ? `${process.env.REACT_APP_URL_BACKEND}/assets/${editImage}` : URL.createObjectURL(editImage);
-
-    return (
-      <FlexBetween>
-        <img src={imageUrl} alt="preview" style={{ 
-          width: "40%",
-           height: "auto",
-           borderRadius: "0.75rem",
-           display: "block",
-           margin: "auto"
-          }} />
-      </FlexBetween>
-    );
-  }
-};
+  
+  // const renderImagePreview = () => {
+  //   return (
+  //     <Box>
+  //       {/* Existing Images */}
+  //       {picturePath && picturePath.map((image, index) => (
+  //         <Box key={index} sx={{ position: 'relative', marginBottom: '10px' }}>
+  //           <img
+  //             src={image}
+  //             alt={`Existing post image ${index + 1}`}
+  //             style={{
+  //               width: "100%",
+  //               height: "auto",
+  //               borderRadius: "0.75rem",
+  //             }}
+  //           />
+  //           <Button
+  //             onClick={() => handleRemoveExistingImage(image)}
+  //             sx={{
+  //               position: 'absolute',
+  //               top: '10px',
+  //               right: '10px',
+  //               backgroundColor: 'red',
+  //               color: 'white',
+  //             }}
+  //           >
+  //             Remove
+  //           </Button>
+  //         </Box>
+  //       ))}
+  
+  //       {/* New Images */}
+  //       {newImages && newImages.map((image, index) => (
+  //         <Box key={index} sx={{ position: 'relative', marginBottom: '10px' }}>
+  //           <img
+  //             src={URL.createObjectURL(image)}
+  //             alt={`New post image ${index + 1}`}
+  //             style={{
+  //               width: "100%",
+  //               height: "auto",
+  //               borderRadius: "0.75rem",
+  //             }}
+  //           />
+  //           <Button
+  //             onClick={() => handleRemoveNewImage(image)}
+  //             sx={{
+  //               position: 'absolute',
+  //               top: '10px',
+  //               right: '10px',
+  //               backgroundColor: 'red',
+  //               color: 'white',
+  //             }}
+  //           >
+  //             Remove
+  //           </Button>
+  //         </Box>
+  //       ))}
+  
+  //       {/* Add Image Icon */}
+  //       <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+  //         <IconButton onClick={handleAddNewImages} sx={{ fontSize: '2rem' }}>
+  //           <AddPhotoAlternateOutlined />
+  //         </IconButton>
+  //       </Box>
+  //     </Box>
+  //   );
+  // };
+  
 
   const styles = {
     editBox: {
@@ -428,11 +482,11 @@ const PostWidget = ({
         subtitle={location}
         userPicturePath={userPicturePath}
       />
-            {isEditing ? (
-
+        {isEditing ? (// the post in edit mode
         <Box style={styles.editBox}>
 
-          <div style={styles.editBoxChild}><b>Description: </b>
+          <div style={styles.editBoxChild}>
+            <b>Description: </b>
           <InputBase
             placeholder="Edit description..."
             value={editDescription}
@@ -441,27 +495,7 @@ const PostWidget = ({
           />
           </div>
           <div style={styles.editBoxChild}><b>Image:</b>
-          <Dropzone
-            acceptedFiles=".jpg,.jpeg,.png"
-            multiple={false}
-            onDrop={(acceptedFiles) => setEditImage(acceptedFiles[0].path)}
-          >
-            {({ getRootProps, getInputProps }) => (
-              <FlexBetween>
-                <Box
-                  {...getRootProps()}
-                  backgroundColor={`${palette.neutral.light}`}
-                  borderRadius={'50px'}
-                  p="1rem"
-                  width="100%"
-                  sx={{ "&:hover": { cursor: "pointer" } }}
-                >
-                  <input {...getInputProps()} />
-                  {renderImagePreview()}                  
-                </Box>
-              </FlexBetween>
-            )}
-          </Dropzone>
+            <ImageDropzone images={editImage} setImages={setEditImage} maxImages={10} size="150px" />
           </div>
           <div style={styles.editBoxChild}><b>Location:</b>
           <InputBase
@@ -491,79 +525,82 @@ const PostWidget = ({
           <Button onClick={editPost} sx={{ marginTop: "1rem", backgroundColor: palette.primary.main, color: palette.background.alt }}>Save Changes</Button>
         </Box>
 
-      ) : (
+      ) : (// the post 
         <Box>
+          
           <Typography color={main} sx={{ mt: "1rem" }}>
             {description}
-            <ul style={{
-              listStyleType: "none",
-              display: 'flex',
-              flexDirection: "row",
-              flexWrap: "wrap",
-              padding: '0'
-            }}>
-            {hashtags.map((hashtag) => {
-              return (
-                <li key={hashtag} style={{ margin: '5px'}}>
-                  <b style={{ color: main }}>
-                    #{hashtag}
-                  </b>
-                </li>
-              );
-            })}
-            </ul>
+                
+            {hashtags.length > 0 && ( // Check if hashtags array is not empty
+              <ul style={{
+                listStyleType: "none",
+                display: 'flex',
+                flexDirection: "row",
+                flexWrap: "wrap",
+                padding: '0'
+              }}>
+                {hashtags.map((hashtag) => (
+                  <li key={hashtag} style={{ margin: '5px' }}>
+                    <b style={{ color: main }}>
+                      #{hashtag}
+                    </b>
+                  </li>
+                ))}
+              </ul>
+            )}
           </Typography>
-          {renderImagePreview()}                  
-          <FlexBetween mt="0.25rem">
-            <FlexBetween gap="1rem">
-              <IconButton onClick={patchLike}>
-                {isLiked ? (
-                  <FavoriteOutlined sx={{ color: primary }} />
-                ) : (
-                  <FavoriteBorderOutlined />
-                )}
-              </IconButton>
-              <Typography>{likeCount}</Typography>
 
-              <IconButton onClick={patchDisike}>
-                {isDisLiked ? (
-                  <ThumbDownOutlined sx={{ color: primary }} />
-                ) : (
-                  <ThumbDownOutlined />
-                )}
-              </IconButton>
-              <Typography>{disLikeCount}</Typography>
-            </FlexBetween>
-            <FlexBetween gap="1rem">
-              {(loggedInUserId === postUserId || loggedInUserId === sharedById) && (
-                <IconButton onClick={handleDeletePost}>
-                  <DeleteOutline sx={{ color: primary }} />
-                </IconButton>
+          
+        {/* Use the PostImagesDisplay Component Here */}
+        <PostImagesDisplay images={picturePath} />
+          
+        <FlexBetween mt="0.25rem">
+          <FlexBetween gap="1rem">
+            <IconButton onClick={patchLike}>
+              {isLiked ? (
+                <FavoriteOutlined sx={{ color: primary }} />
+              ) : (
+                <FavoriteBorderOutlined />
               )}
-            </FlexBetween>
-            <DeleteModal 
-              show={showModal} 
-              handleClose={handleCloseModal} 
-              handleConfirm={deletePost} 
-            />            
-            <FlexBetween gap="1rem">
-              {loggedInUserId === postUserId && (
-                <IconButton onClick={() => setIsEditing(true)}>
-                  <EditOutlined sx={{ color: 'black' }} />
-                </IconButton>
-              )}
-            </FlexBetween>
-
-            <IconButton onClick={() => {
-              console.log("logged in user id:", loggedInUserId);
-              console.log("LoggedInUsername:", loggedInUsername);
-              sharePost(loggedInUserId, loggedInUsername);
-            }}>
-              <ShareOutlined />
             </IconButton>
-
+            <Typography>{likeCount}</Typography>
+            
+            <IconButton onClick={patchDisike}>
+              {isDisLiked ? (
+                <ThumbDownOutlined sx={{ color: primary }} />
+              ) : (
+                <ThumbDownOutlined />
+              )}
+            </IconButton>
+            <Typography>{disLikeCount}</Typography>
           </FlexBetween>
-        </Box>
+          <FlexBetween gap="1rem">
+            {(loggedInUserId === postUserId || loggedInUserId === sharedById) && (
+              <IconButton onClick={handleDeletePost}>
+                <DeleteOutline sx={{ color: primary }} />
+              </IconButton>
+            )}
+          </FlexBetween>
+          <DeleteModal 
+            show={showModal} 
+            handleClose={handleCloseModal} 
+            handleConfirm={deletePost} 
+          />            
+          <FlexBetween gap="1rem">
+            {loggedInUserId === postUserId && (
+              <IconButton onClick={() => setIsEditing(true)}>
+                <EditOutlined sx={{ color: 'black' }} />
+              </IconButton>
+            )}
+          </FlexBetween>
+          
+          <IconButton onClick={() => {
+            sharePost(loggedInUserId, loggedInUsername);
+          }}>
+            <ShareOutlined />
+          </IconButton>
+        </FlexBetween>
+      </Box>
       )}
     </WidgetWrapper>
   );

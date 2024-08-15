@@ -6,15 +6,17 @@ import Dropzone from 'react-dropzone';
 const ImageDropzone = ({ images, setImages, maxImages = 10, size = "100px" }) => {
   const { palette } = useTheme();
 
-  const handleDrop = (acceptedFiles) => {
+  const handleDrop = (acceptedFiles) => {// add new imege 
     if (images.length + acceptedFiles.length > maxImages) {
       return alert(`You can only upload up to ${maxImages} images.`);
     }
     setImages((prevImages) => [...prevImages, ...acceptedFiles]);
   };
 
-  const handleRemoveImage = (indexToRemove) => {
+  const handleRemoveImage = (indexToRemove) => {// remove imege 
+    console.log(`Removing ${images[indexToRemove]}`);
     setImages(images.filter((_, idx) => idx !== indexToRemove));
+
   };
 
   return (
