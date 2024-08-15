@@ -93,33 +93,39 @@ const MyPostWidget = ({ picturePath }) => {
   return (
     <WidgetWrapper>
       <FlexBetween gap="1.5rem">
-        <UserImage image={picturePath} />
-        <FlexBetween
-          sx={{
-            flexDirection: 'column', // Arrange children in a column
-            alignItems: 'flex-start', // Align children to start of the cross-axis (horizontal alignment)
-            width: '100%' // Ensure the container takes full width
-          }}
-        >
-          <b style={{ color: mediumMain }}>
-            <span style={{ color: 'red' }}>* </span>
-            Description
-          </b>
-          <InputBase
-            placeholder="What's on your mind..."
-            onChange={(e) => setPost(e.target.value)}
-            value={post}
-            sx={{
-              width: "100%", // Full width of the container
-              backgroundColor: palette.neutral.light,
-              minHeight: "100px",
-              borderRadius: "2rem",
-              padding: "1rem 2rem",
-              marginTop: "0.5rem" // Add some spacing between the label and the input
-            }}
-          />
-        </FlexBetween>
-      </FlexBetween>
+  <UserImage image={picturePath} />
+  <FlexBetween
+    sx={{
+      flexDirection: 'column', // Arrange children in a column
+      alignItems: 'flex-start', // Align children to start of the cross-axis (horizontal alignment)
+      width: '100%' // Ensure the container takes full width
+    }}
+  >
+    <b style={{ color: mediumMain }}>
+      <span style={{ color: 'red' }}>* </span>
+      Description
+    </b>
+    <textarea
+      placeholder="What's on your mind..."
+      onChange={(e) => setPost(e.target.value)}
+      value={post}
+      style={{
+        width: '100%', // Full width of the container
+        backgroundColor: palette.neutral.light,
+        minHeight: '80px',
+        borderRadius: '2rem',
+        padding: '1rem 2rem',
+        marginTop: '0.5rem', // Add some spacing between the label and the textarea
+        border: 'none', // Optional: removes default border
+        resize: 'vertical', // Allows the user to resize vertically
+        overflow: 'auto', // Allows for scrolling if the content exceeds the visible area
+        fontFamily: 'inherit', // Ensures consistent font styling with the rest of the UI
+        boxSizing: 'border-box' // Ensures padding is included in the width and height
+      }}
+    />
+  </FlexBetween>
+</FlexBetween>
+
       {isImage && (
         <Box>
         <h1>Upload Your Images</h1>
