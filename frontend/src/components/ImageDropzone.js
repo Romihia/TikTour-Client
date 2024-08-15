@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, IconButton, Typography, useTheme } from '@mui/material';
 import { DeleteOutlined } from '@mui/icons-material';
 import Dropzone from 'react-dropzone';
 
-const ImageDropzone = ({ images=[], setImages, maxImages = 10, size = "100px" }) => {
+const ImageDropzone = ({ images, setImages, maxImages = 10, size = "100px" }) => {
   const { palette } = useTheme();
 
   const handleDrop = (acceptedFiles) => {
@@ -53,11 +53,20 @@ const ImageDropzone = ({ images=[], setImages, maxImages = 10, size = "100px" })
                 borderRadius: "8px",
               }}
             >
-              <img
-                src={URL.createObjectURL(img)}
-                alt={`preview-${idx}`}
-                style={{ width: size, height: size, borderRadius: "8px" }}
-              />
+              {/* Differentiate between URLs and Files */}
+              {typeof img === 'string' ? (
+                <img
+                  src={img}
+                  alt={`preview-${idx}`}
+                  style={{ width: size, height: size, borderRadius: "8px" }}
+                />
+              ) : (
+                <img
+                  src={URL.createObjectURL(img)}
+                  alt={`preview-${idx}`}
+                  style={{ width: size, height: size, borderRadius: "8px" }}
+                />
+              )}
               <IconButton
                 onClick={() => handleRemoveImage(idx)}
               >
