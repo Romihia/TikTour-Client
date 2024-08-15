@@ -55,7 +55,7 @@ const PostWidget = ({
 
     console.log(formData);
 
-    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
+    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {// create posts
       method: "POST",
       headers: { 
         Authorization: `Bearer ${token}`,
@@ -530,24 +530,23 @@ const PostWidget = ({
           
           <Typography color={main} sx={{ mt: "1rem" }}>
             {description}
-                
-            {hashtags.length > 0 && ( // Check if hashtags array is not empty
-              <ul style={{
-                listStyleType: "none",
-                display: 'flex',
-                flexDirection: "row",
-                flexWrap: "wrap",
-                padding: '0'
-              }}>
-                {hashtags.map((hashtag) => (
-                  <li key={hashtag} style={{ margin: '5px' }}>
-                    <b style={{ color: main }}>
-                      #{hashtag}
-                    </b>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <ul style={{
+              listStyleType: "none",
+              display: 'flex',
+              flexDirection: "row",
+              flexWrap: "wrap",
+              padding: '0'
+            }}>
+            {hashtags.map((hashtag) => {
+              return (
+                <li key={hashtag} style={{ margin: '5px'}}>
+                  <b style={{ color: main }}>
+                    #{hashtag}
+                  </b>
+                </li>
+              );
+            })}
+            </ul>
           </Typography>
 
           
@@ -575,7 +574,7 @@ const PostWidget = ({
             <Typography>{disLikeCount}</Typography>
           </FlexBetween>
           <FlexBetween gap="1rem">
-            {(loggedInUserId === postUserId || loggedInUserId === sharedById) && (
+            {((loggedInUserId === postUserId && !sharedById) || loggedInUserId === sharedById) && (
               <IconButton onClick={handleDeletePost}>
                 <DeleteOutline sx={{ color: primary }} />
               </IconButton>
@@ -587,7 +586,7 @@ const PostWidget = ({
             handleConfirm={deletePost} 
           />            
           <FlexBetween gap="1rem">
-            {loggedInUserId === postUserId && (
+            {((loggedInUserId === postUserId && !sharedById)|| loggedInUserId === sharedById) && (
               <IconButton onClick={() => setIsEditing(true)}>
                 <EditOutlined sx={{ color: 'black' }} />
               </IconButton>
