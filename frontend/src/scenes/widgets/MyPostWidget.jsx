@@ -47,26 +47,27 @@ const MyPostWidget = ({ picturePath }) => {
   const medium = palette.neutral.medium;
 
   const handlePost = async () => {
-    try{
-    const formData = {
-      userId: _id,
-      sharedById: "",
-      description: post,
-      location,
-      hashtags: hashtagsList,
-    };
-
-    if (image) {
-      formData["picturePath"] = image.name;
-    }
-
-    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
-      method: "POST",
-      headers: { 
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+    try {
+      const formData = new FormData(); // Create a FormData object
+      formData.append("userId", _id);
+      formData.append("sharedById", "");
+      formData.append("description", post);
+      formData.append("location", location);
+      formData.append("hashtags", hashtagsList); // Convert hashtags array to string
+  
+      // Append each image to the FormData object
+      if (image && image.length > 0) {
+        image.forEach((img, index) => {
+          formData.append("pictures", img); // Add images to the 'pictures' field
+        });
+      }
+  
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
+        method: "POST",
+        headers: { 
+          Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(formData),
+      body: formData,
     });
 
 
@@ -84,22 +85,11 @@ const MyPostWidget = ({ picturePath }) => {
     setTimeout(() => {
       window.location.reload();
     }, 750);
-    
-
-    // Sort posts by createdAt in descending order
-    posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    // dispatch(setPosts({ posts }));
-    // setImage(null);
-    // setPost("");
-    // setLocation(""); // Reset location after posting
-    // setAddedLocation(false);
-    // setHashtagsList([]); // Clear the hashtags list
-    // window.location.reload();
+    //posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
+  } catch (error) {
+    console.error("Error uploading post:", error);
   }
-  catch(error){
-  }
-
-  };
+};
 
   return (
     <WidgetWrapper>
@@ -140,8 +130,8 @@ const MyPostWidget = ({ picturePath }) => {
         >
           <Dropzone
             acceptedFiles=".jpg,.jpeg,.png"
-            multiple={false}
-            onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
+            multiple={true} // Allow multiple files
+            onDrop={(acceptedFiles) => setImage(acceptedFiles)} // Set images as an array
           >
             {({ getRootProps, getInputProps }) => (
               <FlexBetween>
@@ -153,16 +143,18 @@ const MyPostWidget = ({ picturePath }) => {
                   sx={{ "&:hover": { cursor: "pointer" } }}
                 >
                   <input {...getInputProps()} />
-                  {!image ? (
-                    <p>Add Image Here</p>
+                  {!image || image.length === 0 ? (
+                    <p>Add Images Here</p>
                   ) : (
-                    <FlexBetween>
-                      <Typography>{image.name}</Typography>
-                      <EditOutlined />
-                    </FlexBetween>
+                    image.map((img, idx) => (
+                      <FlexBetween key={idx}>
+                        <Typography>{img.name}</Typography>
+                        <EditOutlined />
+                      </FlexBetween>
+                    ))
                   )}
                 </Box>
-                {image && (
+                {image && image.length > 0 && (
                   <IconButton
                     onClick={() => setImage(null)}
                     sx={{ width: "15%" }}
