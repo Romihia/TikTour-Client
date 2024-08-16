@@ -6,7 +6,7 @@ import { setFollowing,setFollowers } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const Followers = ({ userId, name, subtitle, userPicturePath, isDeleted = false }) => {
+const Followers = ({ userId, name, subtitle, userPicturePath, isDeleted = false ,showIcons}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
@@ -80,7 +80,7 @@ const Followers = ({ userId, name, subtitle, userPicturePath, isDeleted = false 
           </Typography>
         </Box>
       </FlexBetween>
-      {!isFollowing && !isDeleted && (
+      {!isFollowing && !isDeleted && showIcons && (
         <IconButton
           onClick={toggleFollowing}
           sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
