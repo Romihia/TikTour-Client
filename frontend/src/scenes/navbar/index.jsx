@@ -25,6 +25,7 @@ import {
   DeleteOutline,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
+import FontSizeSelector from 'components/FontSizeSelector'; // Import FontSizeSelector 
 import { setMode, setLogout } from "state";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
@@ -628,6 +629,16 @@ const Navbar = () => {
               <MenuItem value={fullName}>
                 <Typography>{fullName}</Typography>
               </MenuItem>
+
+              {/* Add the font size selector here */}
+                <MenuItem value={"set font size"}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2" color="textPrimary">
+                      Font Size
+                    </Typography>
+                  <FontSizeSelector /> {/* This will render the font size options */}
+                </Box>
+              </MenuItem>
               <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
             </Select>
           </FormControl>
@@ -702,6 +713,15 @@ const Navbar = () => {
               >
                 <MenuItem value={fullName}>
                   <Typography>{fullName}</Typography>
+                </MenuItem>
+                {/* Add the font size selector here */}
+                <MenuItem value={"set font size"}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2" color="textPrimary">
+                      Font Size
+                    </Typography>
+                    <FontSizeSelector /> {/* This will render the font size options */}
+                  </Box>
                 </MenuItem>
                 <MenuItem onClick={() => dispatch(setLogout())}>
                   Log Out
