@@ -272,7 +272,7 @@ const PostWidget = ({
     formData.append("userId", postUserId);
     formData.append("description", editDescription);
     formData.append("location", editLocation);
-    formData.append("hashtags", editHashtags);
+    formData.append("hashtags", JSON.stringify(editHashtags)); // Convert hashtags array to string
     // Initialize arrays to store new images to upload and images to remove
     const imagesToRemove = [];
     const newImages = [];
