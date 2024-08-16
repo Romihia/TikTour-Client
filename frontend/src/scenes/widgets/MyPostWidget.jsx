@@ -67,7 +67,6 @@ const MyPostWidget = ({ picturePath }) => {
         });
       }
   
-      alert("Sending post request");
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
         method: "POST",
         headers: { 
