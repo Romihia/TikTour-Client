@@ -54,46 +54,46 @@ const MyPostWidget = ({ picturePath }) => {
 
   const handlePost = async () => {
     try {
-      const formData = new FormData(); // Create a FormData object
+      const formData = new FormData(); 
       formData.append("userId", _id);
       formData.append("sharedById", "");
       formData.append("description", post);
       formData.append("location", location);
-      formData.append("hashtags", hashtagsList); // Convert hashtags array to string
-        
-      // Append each image to the FormData object
+      formData.append("hashtags", JSON.stringify(hashtagsList)); // Convert hashtags array to string
+  
       if (postImagesList && postImagesList.length > 0) {
-        postImagesList.forEach((img, index) => {
+        postImagesList.forEach((img) => {
           formData.append("pictures", img); // Add images to the 'pictures' field
         });
       }
   
+      alert("Sending post request");
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
         method: "POST",
         headers: { 
           Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-
-    let posts = await response.json();
-    toast.success("The post was posted successfully!", {
-      position: 'top-center',
-      autoClose: 700,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-    
-    //Delay the reload until after the toast has been shown for 0.5 seconds
-    setTimeout(() => {
-      window.location.reload();
-    }, 750);
-  } catch (error) {
-    console.error("Error uploading post:", error);
-  }
-};
+        },
+        body: formData,
+      });
+  
+      let posts = await response.json();
+      toast.success("The post was posted successfully!", {
+        position: 'top-center',
+        autoClose: 700,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 750);
+    } catch (error) {
+      console.error("Error uploading post:", error);
+    }
+  };
+  
 
 
 
