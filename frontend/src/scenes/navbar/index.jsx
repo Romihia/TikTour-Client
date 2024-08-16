@@ -99,7 +99,6 @@ const Navbar = () => {
   
 
   const fullName = `${user.firstName} ${user.lastName}`;
-
   const searchForUser = async (username) => {
     if (username === "") {
       toast.error("User not found!", {
@@ -607,9 +606,9 @@ const Navbar = () => {
           <IconButton onClick={() => navigate("/about")}>
           <Help sx={{ fontSize: "25px" }} />
           </IconButton>
-          <FormControl variant="standard" value={fullName}>
+          <FormControl variant="standard" value={fullName !== " " ? (fullName):(user.username)}>
             <Select
-              value={fullName}
+              value={fullName !== " " ? (fullName):(user.username)}
               sx={{
                 backgroundColor: neutralLight,
                 width: "150px",
@@ -625,9 +624,15 @@ const Navbar = () => {
               }}
               input={<InputBase />}
             >
-              <MenuItem value={fullName}>
-                <Typography>{fullName}</Typography>
-              </MenuItem>
+                {fullName !== " " ? (
+                <MenuItem value={fullName}>
+                  <Typography>{fullName}</Typography>
+                </MenuItem>
+                ):(
+                  <MenuItem value={user.username}>
+                  <Typography>{user.username}</Typography>
+                </MenuItem>
+                )}
               <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
             </Select>
           </FormControl>
@@ -700,9 +705,15 @@ const Navbar = () => {
                 }}
                 input={<InputBase />}
               >
+                {fullName !== " " ? (
                 <MenuItem value={fullName}>
                   <Typography>{fullName}</Typography>
                 </MenuItem>
+                ):(
+                  <MenuItem value={user.username}>
+                  <Typography>{user.username}</Typography>
+                </MenuItem>
+                )}
                 <MenuItem onClick={() => dispatch(setLogout())}>
                   Log Out
                 </MenuItem>
