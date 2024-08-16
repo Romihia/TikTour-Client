@@ -200,7 +200,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />
-          {loggedInUserId !== userId && (
+          {loggedInUserId !== userId && !user.isDeleted && (
             <Button
             variant="contained"
             color={isFollowing ? "secondary" : "primary"}

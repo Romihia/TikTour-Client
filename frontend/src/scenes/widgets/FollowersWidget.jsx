@@ -46,6 +46,7 @@ const FollowerListWidget = ({ userId }) => {
               name={`${user.firstName} ${user.lastName}`}
               subtitle={user.rank}
               userPicturePath={user.picturePath}
+              isDeleted={user.isDeleted}
             />
           ))
         ) : (
