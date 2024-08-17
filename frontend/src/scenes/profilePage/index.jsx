@@ -139,6 +139,10 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       setOpenProfileEdit(true);
 
   };
+  const closeEditAccount = async () =>{
+      setOpenProfileEdit(false);
+      window.location.reload();
+  };
   const passwordChange = async (oldPassword, newPassword) => {
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/password`, {
@@ -313,7 +317,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       {openProfileEdit && (
         <ProfileEdit
           open={openProfileEdit}
-          onClose={() => setOpenProfileEdit(false)}
+          onClose={() => closeEditAccount()}
         />
       )}
     </Box>
