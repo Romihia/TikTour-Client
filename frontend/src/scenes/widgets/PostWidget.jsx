@@ -53,39 +53,40 @@ const PostWidget = ({
       hashtags: hashtags,
       picturePath: picturePath,
     };
-
+  
     console.log(formData);
-    const textAreaRef = useRef(null);
-    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {// create posts
+  
+    // Create the post
+    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
       method: "POST",
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
     });
-
+  
     let posts = await response.json();
-    console.log("posts: ",posts);
-
+    console.log("posts: ", posts);
+  
     // Sort posts by createdAt in descending order
-
     posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     dispatch(setPosts({ posts }));
-    
+  
     toast.success("The post was shared successfully!", {
-      position: 'top-center',
+      position: "top-center",
       autoClose: 700,
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
     });
-    
-    // Delay the reload until after the toast has been shown for 0.5 seconds
+  
+    // Delay the reload until after the toast has been shown for 0.75 seconds
     setTimeout(() => {
       window.location.reload();
     }, 750);
+  
     setLoading(false);
   };
 
