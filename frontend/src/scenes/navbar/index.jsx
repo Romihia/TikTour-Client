@@ -25,6 +25,7 @@ import {
   DeleteOutline,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
+import FontSizeSelector from 'components/FontSizeSelector'; // Import FontSizeSelector 
 import { setMode, setLogout } from "state";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
@@ -44,7 +45,9 @@ const Navbar = () => {
   const [chosenAttributes, setChosenAttributes] = useState([]);
   const [searchingFiltersHistory, setSearchingFiltersHistory] = useState([]);
   const [showSearchingFiltersHistory, setShowSearchingFiltersHistory] = useState(false);
-
+  const [savedPosts, setSavedPosts] = useState([]);
+  const loggedInUserId = useSelector((state) => state.user._id);
+  const [reloader, setReloader] = useState(true);
 
   const token = useSelector((state) => state.token);
 
@@ -77,14 +80,32 @@ const Navbar = () => {
     setSearchType(chosenAttributes.searchType);
   }, [chosenAttributes]);
 
-  const fullName = `${user.firstName} ${user.lastName}`;
+  useEffect(() => {
+    initializeSavedPosts();
+  }, []);
 
+  const initializeSavedPosts = async () => {
+    const response = await fetch(
+      `${process.env.REACT_APP_URL_BACKEND}/save/${loggedInUserId}/getSavedPosts`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    const data = await response.json();
+    const savedPosts = data.savedPosts;
+    setSavedPosts(savedPosts);
+  };
+
+  
+
+  const fullName = `${user.firstName} ${user.lastName}`;
   const searchForUser = async (username) => {
     if (username === "") {
       toast.error("User not found!", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -105,7 +126,7 @@ const Navbar = () => {
       toast.error("User not found!", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -187,7 +208,7 @@ const Navbar = () => {
         toast.error("Users not found!", {
           position: 'top-center',
           autoClose: 1000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -199,7 +220,7 @@ const Navbar = () => {
       toast.error("An error occurred while searching for users.", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -232,7 +253,7 @@ const Navbar = () => {
         toast.error("Posts not found!", {
           position: 'top-center',
           autoClose: 1000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -244,7 +265,7 @@ const Navbar = () => {
       toast.error("An error occurred while searching for posts.", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -305,7 +326,7 @@ const Navbar = () => {
         toast.error("Content not found!", {
           position: 'top-center',
           autoClose: 1000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -317,7 +338,7 @@ const Navbar = () => {
       toast.error("An error occurred while searching for posts.", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -349,7 +370,7 @@ const Navbar = () => {
       toast.success("Filter removed successfully!", {
         position: 'top-center',
         autoClose: 1000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -360,6 +381,10 @@ const Navbar = () => {
     }
   };
   
+  const reloadSearch = async () => {
+    searchByFreeText(searchUsername);
+    window.location.reload();
+  };
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -536,14 +561,14 @@ const Navbar = () => {
               overflowX: 'hidden',  // Prevent horizontal scrolling
             }}
           >
-            {
+            { reloader &&
               searchContent?.length > 0 && searchContent.map((data, index) => {
               console.log(`data[${index}]`, data);
               return <li key={index}>
                 {
                   data.email ? // user
-                  <SearchResult isPost={false} data={data} /> : 
-                  <SearchResult isPost={true} data={data} />
+                  <SearchResult savedPosts={savedPosts} isPost={false} data={data} /> : 
+                  <SearchResult savedPosts={savedPosts} isPost={true} data={data} />
                 }
               </li>;
             })}
@@ -582,9 +607,9 @@ const Navbar = () => {
           <IconButton onClick={() => navigate("/about")}>
           <Help sx={{ fontSize: "25px" }} />
           </IconButton>
-          <FormControl variant="standard" value={fullName}>
+          <FormControl variant="standard" value={fullName !== " " ? (fullName):(user.username)}>
             <Select
-              value={fullName}
+              value={fullName !== " " ? (fullName):(user.username)}
               sx={{
                 backgroundColor: neutralLight,
                 width: "150px",
@@ -600,8 +625,23 @@ const Navbar = () => {
               }}
               input={<InputBase />}
             >
-              <MenuItem value={fullName}>
-                <Typography>{fullName}</Typography>
+                {fullName !== " " ? (
+                  <MenuItem value={fullName}>
+                    <Typography>{fullName}</Typography>
+                  </MenuItem>
+                  ):(
+                    <MenuItem value={user.username}>
+                    <Typography>{user.username}</Typography>
+                  </MenuItem>
+                  )}
+              {/* Add the font size selector here */}
+                <MenuItem value={"set font size"}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2" color="textPrimary">
+                      Font Size
+                    </Typography>
+                  <FontSizeSelector /> {/* This will render the font size options */}
+                </Box>
               </MenuItem>
               <MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
             </Select>
@@ -675,8 +715,23 @@ const Navbar = () => {
                 }}
                 input={<InputBase />}
               >
+                {fullName !== " " ? (
                 <MenuItem value={fullName}>
                   <Typography>{fullName}</Typography>
+                </MenuItem>
+                ):(
+                  <MenuItem value={user.username}>
+                  <Typography>{user.username}</Typography>
+                </MenuItem>
+                )}
+                {/* Add the font size selector here */}
+                <MenuItem value={"set font size"}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="body2" color="textPrimary">
+                      Font Size
+                    </Typography>
+                    <FontSizeSelector /> {/* This will render the font size options */}
+                  </Box>
                 </MenuItem>
                 <MenuItem onClick={() => dispatch(setLogout())}>
                   Log Out

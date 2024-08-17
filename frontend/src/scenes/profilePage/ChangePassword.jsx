@@ -41,7 +41,7 @@ newPassword, setNewPassword, confirmNewPassword, setConfirmNewPassword }) => {
         toast.error("The new password is already in use, please choose a different password!", {
           position: 'top-center',
           autoClose: 5000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -53,7 +53,7 @@ newPassword, setNewPassword, confirmNewPassword, setConfirmNewPassword }) => {
         toast.error("New passwords don't match!", {
           position: 'top-center',
           autoClose: 5000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -67,7 +67,7 @@ newPassword, setNewPassword, confirmNewPassword, setConfirmNewPassword }) => {
       toast.error(err.message, {
         position: 'top-center',
         autoClose: 5000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,

@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -17,24 +17,24 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import FlexBetween from "components/FlexBetween";
-import Dropzone from "react-dropzone";
 import UserImage from "components/UserImage";
 import WidgetWrapper from "components/WidgetWrapper";
 import LocationAutocomplete from "./LocationAutocomplete";
 import HashtagsTextField from "./HashtagsTextField";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import ImageDropzone from "components/ImageDropzone";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
+import LoadingPopup from'components/LoadingPopup';
 
 const MyPostWidget = ({ picturePath }) => {
+  const [loading, setLoading] = useState(false);
   const [hashtagsList, setHashtagsList] = useState([]);
-  //const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [location, setLocation] = useState(""); // Location state
   const [addedLocation, setAddedLocation] = useState(false);
-  const [image, setImage] = useState(null);
+  const [postImagesList, setPostImagesList] = useState([]);
   const [post, setPost] = useState("");
   const [showLocationAutocomplete, setShowLocationAutocomplete] = useState(false); // To toggle autocomplete display
   const [showHashtagsTextField, setShowHashtagsTextField] = useState(false);
@@ -46,61 +46,58 @@ const MyPostWidget = ({ picturePath }) => {
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
 
-  const handlePost = async () => {
-    try{
-    const formData = {
-      userId: _id,
-      sharedById: "",
-      description: post,
-      location,
-      hashtags: hashtagsList,
-    };
+  const textAreaRef = useRef(null);
 
-    if (image) {
-      formData["picturePath"] = image.name;
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.scrollLeft = 10; // Move scroll pane 10 pixels to the right
     }
+  }, [post]); // This effect runs whenever the post text changes
 
-    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
-      method: "POST",
-      headers: { 
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-
-    let posts = await response.json();
-    toast.success("The post was posted successfully!", {
-      position: 'top-center',
-      autoClose: 700,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
-    
-    //Delay the reload until after the toast has been shown for 0.5 seconds
-    setTimeout(() => {
-      window.location.reload();
-    }, 750);
-    
-
-    // Sort posts by createdAt in descending order
-    posts = posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    // dispatch(setPosts({ posts }));
-    // setImage(null);
-    // setPost("");
-    // setLocation(""); // Reset location after posting
-    // setAddedLocation(false);
-    // setHashtagsList([]); // Clear the hashtags list
-    // window.location.reload();
-  }
-  catch(error){
-  }
-
+  const handlePost = async () => {
+    setLoading(true);
+    try {
+      const formData = new FormData(); 
+      formData.append("userId", _id);
+      formData.append("sharedById", "");
+      formData.append("description", post);
+      formData.append("location", location);
+      formData.append("hashtags", JSON.stringify(hashtagsList)); // Convert hashtags array to string
+  
+      if (postImagesList && postImagesList.length > 0) {
+        postImagesList.forEach((img) => {
+          formData.append("pictures", img); // Add images to the 'pictures' field
+        });
+      }
+  
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {
+        method: "POST",
+        headers: { 
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+  
+      let posts = await response.json();
+      toast.success("The post was posted successfully!", {
+        position: 'top-center',
+        autoClose: 700,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 750);
+    } catch (error) {
+      console.error("Error uploading post:", error);
+    }finally {
+      setLoading(false); 
+    }
   };
-
+  
   return (
     <WidgetWrapper>
       <FlexBetween gap="1.5rem">
@@ -116,80 +113,49 @@ const MyPostWidget = ({ picturePath }) => {
             <span style={{ color: 'red' }}>* </span>
             Description
           </b>
-          <InputBase
+          <textarea
+            ref={textAreaRef} // Add ref to access the DOM element
             placeholder="What's on your mind..."
             onChange={(e) => setPost(e.target.value)}
             value={post}
-            sx={{
-              width: "100%", // Full width of the container
+            style={{
+              width: '100%', // Full width of the container
               backgroundColor: palette.neutral.light,
-              minHeight: "100px",
-              borderRadius: "2rem",
-              padding: "1rem 2rem",
-              marginTop: "0.5rem" // Add some spacing between the label and the input
+              minHeight: '80px',
+              borderRadius: '1rem', // Adjust the border radius
+              padding: '1rem 1.5rem', // Adequate padding for text and scroll
+              marginTop: '0.5rem', // Spacing between the label and the textarea
+              border: 'none', // Removes the default border
+              resize: 'vertical', // Allows the user to resize vertically
+              overflow: 'auto', // Enables scrolling
+              fontFamily: 'inherit', // Ensures consistent font styling with the rest of the UI
+              boxSizing: 'border-box', // Ensures padding is included in the width and height
             }}
           />
         </FlexBetween>
       </FlexBetween>
+
       {isImage && (
-        <Box
-          border={`1px solid ${medium}`}
-          borderRadius="5px"
-          mt="1rem"
-          p="1rem"
-        >
-          <Dropzone
-            acceptedFiles=".jpg,.jpeg,.png"
-            multiple={false}
-            onDrop={(acceptedFiles) => setImage(acceptedFiles[0])}
-          >
-            {({ getRootProps, getInputProps }) => (
-              <FlexBetween>
-                <Box
-                  {...getRootProps()}
-                  border={`2px dashed ${palette.primary.main}`}
-                  p="1rem"
-                  width="100%"
-                  sx={{ "&:hover": { cursor: "pointer" } }}
-                >
-                  <input {...getInputProps()} />
-                  {!image ? (
-                    <p>Add Image Here</p>
-                  ) : (
-                    <FlexBetween>
-                      <Typography>{image.name}</Typography>
-                      <EditOutlined />
-                    </FlexBetween>
-                  )}
-                </Box>
-                {image && (
-                  <IconButton
-                    onClick={() => setImage(null)}
-                    sx={{ width: "15%" }}
-                  >
-                    <DeleteOutlined />
-                  </IconButton>
-                )}
-              </FlexBetween>
-            )}
-          </Dropzone>
+        <Box>
+          <h1>Upload Your Images</h1>
+          <ImageDropzone images={postImagesList} setImages={setPostImagesList} maxImages={10} size="150px" />
         </Box>
       )}
 
       <Box>
         {addedLocation &&
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0.5rem',
-          borderRadius: '5px',
-          fontWeight: 'bold',
-          width: 'fit-content'
-        }}>
-          <LocationOnOutlined />
-          <p style={{ color: 'red', marginRight: '5px' }}>Location: </p>
-          <p>{location}</p>
-        </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0.5rem',
+            borderRadius: '5px',
+            fontWeight: 'bold',
+            width: 'fit-content'
+          }}>
+            <LocationOnOutlined />
+            <p style={{ color: 'red', marginRight: '5px' }}>Location: </p>
+            <p>{location}</p>
+          </div>
         }
         {showLocationAutocomplete && (
           <LocationAutocomplete
@@ -229,7 +195,7 @@ const MyPostWidget = ({ picturePath }) => {
             sx={{ "&:hover": { cursor: "pointer", color: medium } }}
           >
             <b>
-            Image
+              Image
             </b>
           </Typography>
         </FlexBetween>
@@ -274,6 +240,7 @@ const MyPostWidget = ({ picturePath }) => {
         >
           POST
         </Button>
+        <LoadingPopup open={loading} />
       </FlexBetween>
     </WidgetWrapper>
   );

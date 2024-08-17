@@ -6,7 +6,7 @@ import { setFollowing } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const Following = ({ userId, name, subtitle, userPicturePath }) => {
+const Following = ({ userId, username,name, subtitle, userPicturePath ,showIcons}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
@@ -76,25 +76,25 @@ const Following = ({ userId, name, subtitle, userPicturePath }) => {
               },
             }}
           >
-            {name}
+            {name === " " ? username : name}
           </Typography>
           <Typography color={medium} fontSize="0.75rem">
             {subtitle}
           </Typography>
         </Box>
       </FlexBetween>
-      {userId != loggedInUserId &&
+      {userId !== loggedInUserId&&showIcons &&(
       <IconButton
-              onClick={toggleFollowing}
-              sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
-            >
-              {isFollowing ? (
-                <PersonRemoveOutlined sx={{ color: primaryDark }} />
-              ) : (
-                <PersonAddOutlined sx={{ color: primaryDark }} />
-              )}
-            </IconButton>
-      }
+          onClick={toggleFollowing}
+          sx={{ backgroundColor: primaryLight, p: "0.6rem" }}
+        >
+          {isFollowing ? (
+            <PersonRemoveOutlined sx={{ color: primaryDark }} />
+          ) : (
+            <PersonAddOutlined sx={{ color: primaryDark }} />
+          )}
+        </IconButton>
+      )}
     </FlexBetween>
   );
 

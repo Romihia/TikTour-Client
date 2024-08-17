@@ -43,6 +43,7 @@ export const authSlice = createSlice({
       if (action.payload.followers.length > 0) {
         state.followers = action.payload.followers;
       } else {
+        state.followers= [];
         console.error("Followers list is empty");
       }
     },

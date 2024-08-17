@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { IconButton, Menu, MenuItem, useTheme } from '@mui/material';
 import { Notifications as NotificationIcon } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
+
 
 export default function Notifications({userId}) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -9,6 +11,7 @@ export default function Notifications({userId}) {
   const token = useSelector((state) => state.token);
   const state = useSelector((state) => state);
   const { palette } = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getNotifications();
@@ -102,7 +105,7 @@ export default function Notifications({userId}) {
       notificationsObjects.forEach((notification) => notificationTexts.push(notification.text));
     
       // Update the state with the new notification texts
-      setNotifications(notificationTexts);
+      setNotifications(notificationsObjects);
     
       // Log the notification texts
       console.log("Fetched Notifications:", notifications);
@@ -175,9 +178,14 @@ export default function Notifications({userId}) {
         {notifications.length > 0 ? (
           notifications.map((notification, notificationIndex) => (
             <MenuItem key={notificationIndex} onClick={async () => {
+              if (notification.notificationType === "newFollower") {
+                navigate(`/profile/${notification.followerId}`);
+                navigate(0);
+              }
+              
               await deleteNotificationFromDatabase(notificationIndex);
             }}>
-              {notification}
+              {notification.text}
             </MenuItem>
           ))
         ) : (

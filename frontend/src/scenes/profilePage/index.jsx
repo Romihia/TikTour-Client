@@ -12,18 +12,20 @@ import PostsWidget from "scenes/widgets/PostsWidget";
 import UserWidget from "scenes/widgets/UserWidget";
 import TotalLikesWidget from "scenes/widgets/TotalLikesWidget";
 import TopLikerWidget from "scenes/widgets/TopLikerWidget";
-import { setFollowing } from "state";
+import { setFollowers } from "state";
 import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
 import ProfileEdit from 'scenes/profilePage/ProfileEdit';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { setLogout } from "state";
+import DeleteModal from "components/DeleteConfirmation";
+
 
 const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
-  const following = useSelector((state) => state.user.following || []);
-  const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
+  const followers = useSelector((state) => state.followers || []);
+  const [isFollowing, setIsFollowing] = useState(null);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -39,6 +41,18 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [openProfileEdit, setOpenProfileEdit] = useState(false);
   const { palette } = useTheme();
 
+  const getIsFollowing = async () => {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/following`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+      const following = data.some((user) => user._id === userId);
+      return following;
+    };
 
   const buttonStyle = {
     width: '60%',
@@ -54,6 +68,15 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
     },
   };
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDeleteAccount = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
   
   const getUser = async () => {
     try {
@@ -89,7 +112,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      dispatch(setFollowing({ following: data }));
+      dispatch(setFollowers({ followers: data }));
       setIsFollowing(!isFollowing);
     } catch (error) {
       console.error('Error during toggleFollowing:', error);
@@ -97,12 +120,8 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   };
 
   const deleteAccount = async () => {
-    const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-    if (confirmed) {
       try {
         dispatch(setLogout());
-        navigate('/login');
-        
         const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}`, {
           method: "DELETE",
           headers: {
@@ -116,21 +135,25 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
         toast.success("Account deleted successfully!", {
           position: 'top-center',
           autoClose: 1000, // Toast duration set to 1 second
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
         });
-        
+
 
       } catch (error) {
         console.error('Error during account deletion:', error);
       }
-    }
+
   };
   const editAccount = async () => {
       setOpenProfileEdit(true);
 
+  };
+  const closeEditAccount = async () =>{
+      setOpenProfileEdit(false);
+      window.location.reload();
   };
   const passwordChange = async (oldPassword, newPassword) => {
     try {
@@ -155,7 +178,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
         toast.success("Password changed successfully!", {
           position: 'top-center',
           autoClose: 1000, // Toast duration set to 1 second
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
@@ -167,7 +190,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       toast.error("Error during password change", {
         position: 'top-center',
         autoClose: 1500, // Toast duration set to 1 second
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
@@ -175,8 +198,15 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
     }
   };
 
+
+
   useEffect(() => {
     getUser();
+    const fetchFollowingStatus = async () => {
+        const followingStatus = await getIsFollowing();
+        setIsFollowing(followingStatus);
+    };
+    fetchFollowingStatus();
   }, [userId, loggedInUserId, token]);
 
   if (!user) return null;
@@ -193,7 +223,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />
-          {loggedInUserId !== userId && (
+          {loggedInUserId !== userId && !user.isDeleted && (
             <Button
             variant="contained"
             color={isFollowing ? "secondary" : "primary"}
@@ -235,16 +265,23 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
                   }
                   }
                 >
-                  Watch Saved
+                  Watch Saved & Liked
                 </Button>
                 }
-
                 <Button
-                  onClick={deleteAccount}
                   sx={buttonStyle}
+                  onClick={() => {
+                    handleDeleteAccount();
+                  }
+                  }
                 >
-                  Delete Account
+                Delete My Account
                 </Button>
+                <DeleteModal
+                  show={showModal}
+                  handleClose={handleCloseModal}
+                  handleConfirm={deleteAccount}
+                />
                 <Button
                   onClick={() => setOpenPasswordDialog(true)}
                   sx={buttonStyle}
@@ -260,13 +297,13 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
 
               </div>
             )}
-          {loggedInUserId === userId && (
+          
             <div>
-              <FollowersWidget userId={userId} />
+              <FollowersWidget userId={userId} showIcons={userId===loggedInUserId}/>
               <Box m="2rem 0" />
-              <FollowingWidget userId={userId} />
+              <FollowingWidget userId={userId} showIcons={userId===loggedInUserId}/>
               <Box m="2rem 0" /></div>
-          )}
+          
           <TotalLikesWidget userId={userId} />
           <Box m="2rem 0" />
           <TopLikerWidget userId={userId} />
@@ -282,7 +319,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
               <Box m="2rem 0" />
             </>
           )}
-          <PostsWidget userId={userId} isProfile={loggedInUserId === userId} onlySaved={showOnlySaved}/>
+          <PostsWidget userId={userId} isProfile={true} onlySaved={showOnlySaved}/>
         </Box>
       </Box>
       <ChangePasswordDialog
@@ -299,7 +336,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       {openProfileEdit && (
         <ProfileEdit
           open={openProfileEdit}
-          onClose={() => setOpenProfileEdit(false)}
+          onClose={() => closeEditAccount()}
         />
       )}
     </Box>

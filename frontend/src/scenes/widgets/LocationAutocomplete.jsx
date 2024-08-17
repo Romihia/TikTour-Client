@@ -17,7 +17,7 @@ const LocationAutocomplete = ({ onSelectLocation }) => {
       toast.error("Location can't be empty!", {
         position: 'top-center',
         autoClose: 1000, // Toast duration set to 1 second
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,

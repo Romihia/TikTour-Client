@@ -41,6 +41,22 @@ const UserWidget = ({ userId, picturePath }) => {
       console.error("Error fetching user data or rank:", error);
     }
   };
+  function getAge(birthDate) {
+      if(!birthDate){
+        return "Age unknown";
+      }
+      const today = new Date();
+      const birth = new Date(birthDate);
+
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDifference = today.getMonth() - birth.getMonth();
+      const dayDifference = today.getDate() - birth.getDate();
+
+      if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+          age--;
+      }
+      return age;
+}
 
   useEffect(() => {
     fetchUserData();
@@ -56,8 +72,8 @@ const UserWidget = ({ userId, picturePath }) => {
     location,
     username,
     dateOfBirth,
+    picturePath: userPicturePath, // Ensure you fetch the picturePath from the backend as well
   } = user;
-  
   const fixedBirthdayDate = dateOfBirth === null ? "No birthday given" : dateOfBirth?.slice(0,10);
 
   return (
@@ -69,7 +85,7 @@ const UserWidget = ({ userId, picturePath }) => {
         onClick={() => navigate(`/profile/${userId}`)}
       >
         <FlexBetween gap="1rem">
-          <UserImage image={picturePath} />
+          <UserImage image={userPicturePath || picturePath} />
           <Box>
             <Typography
               variant="h4"
@@ -82,7 +98,7 @@ const UserWidget = ({ userId, picturePath }) => {
                 },
               }}
             >
-              {firstName === null ? "First Name" : firstName} {lastName === null ? "Last Name" : lastName}
+              {`${firstName} ${lastName}` === " " ? (username):(`${firstName} ${lastName}`)}
             </Typography>
           </Box>
         </FlexBetween>
@@ -94,7 +110,7 @@ const UserWidget = ({ userId, picturePath }) => {
       <Box p="1rem 0">
         <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
           <LocationOnOutlined fontSize="large" sx={{ color: main }} />
-          <Typography color={medium}>{location}</Typography>
+          <Typography color={medium}>{location==="" ?("You don't add location"):(location)}</Typography>
         </Box>
         <Box display="flex" alignItems="center" gap="1rem">
           <StarOutlined  fontSize="large" sx={{ color: main }} />
@@ -106,6 +122,12 @@ const UserWidget = ({ userId, picturePath }) => {
 
       {/* THIRD ROW */}
       <Box p="1rem 0">
+        <FlexBetween mb="0.5rem">
+          <Typography color={medium}>Age</Typography>
+          <Typography color={main} fontWeight="500">
+          {getAge(fixedBirthdayDate)}
+          </Typography>
+        </FlexBetween>
         <FlexBetween mb="0.5rem">
           <Typography color={medium}>Birthday Date</Typography>
           <Typography color={main} fontWeight="500">

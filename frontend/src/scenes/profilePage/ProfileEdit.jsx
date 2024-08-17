@@ -4,9 +4,9 @@ import Dropzone from "react-dropzone";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUserPicturePath } from "state/index.js"; 
 
-const ProfileCompletionPrompt = ({ open, onClose}) => {
+const ProfileEditPrompt = ({ open, onClose }) => {
   const dispatch = useDispatch();
-  const { _id,firstName,lastName,location,email,picturePath } = useSelector((state) => state.user);
+  const { _id, firstName, lastName, location, email, picturePath } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const [profile, setProfile] = useState({
     firstName: firstName,
@@ -15,7 +15,7 @@ const ProfileCompletionPrompt = ({ open, onClose}) => {
     email: email,
     picturePath: picturePath || null,
   });
-
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,20 +23,45 @@ const ProfileCompletionPrompt = ({ open, onClose}) => {
   };
 
   const handleSave = async () => {
-    const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${_id}`, {
+    try {
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("picture", selectedFile);
+
+        const pictureResponse = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${_id}/picture`, {
+          method: "POST",
+          headers: { 
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (!pictureResponse.ok) {
+          throw new Error('Image upload failed');
+        }
+
+        const pictureData = await pictureResponse.json();
+        profile.picturePath = pictureData.picturePath; // Assuming the backend returns the new picture URL in `picturePath`
+        dispatch(updateUserPicturePath({ picturePath: pictureData.picturePath }));
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${_id}`, {
         method: "POST",
-      headers: { 
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(profile),
-    });
-    if (response.ok) {
-      console.log('Profile updated');
-      dispatch(updateUserPicturePath({ picturePath: profile.picturePath }));
-      onClose();
-    } else {
-      console.log('Profile update failed');
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profile),
+      });
+
+      if (response.ok) {
+        console.log('Profile updated');
+        onClose();
+      } else {
+        console.log('Profile update failed');
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
     }
   };
 
@@ -48,7 +73,7 @@ const ProfileCompletionPrompt = ({ open, onClose}) => {
   const renderProfilePicture = () => {
     if (profile.picturePath) {
       const imageUrl = typeof profile.picturePath === "string"
-        ? `${process.env.REACT_APP_URL_BACKEND}/assets/${profile.picturePath}`
+        ? profile.picturePath
         : URL.createObjectURL(profile.picturePath);
 
       return (
@@ -72,8 +97,8 @@ const ProfileCompletionPrompt = ({ open, onClose}) => {
             <Dropzone 
               onDrop={(acceptedFiles) => {
                 if (acceptedFiles && acceptedFiles[0]) {
-                  console.log("File uploaded:", acceptedFiles[0].path );
-                  setProfile({ ...profile, picturePath: acceptedFiles[0].path });
+                  setSelectedFile(acceptedFiles[0]);
+                  setProfile({ ...profile, picturePath: URL.createObjectURL(acceptedFiles[0]) });
                 }
               }}
             >
@@ -137,4 +162,4 @@ const ProfileCompletionPrompt = ({ open, onClose}) => {
   );
 };
 
-export default ProfileCompletionPrompt;
+export default ProfileEditPrompt;
