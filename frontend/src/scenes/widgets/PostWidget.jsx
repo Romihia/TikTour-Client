@@ -39,10 +39,11 @@ const PostWidget = ({
   hashtags,
   likes,
   dislikes,
-  isSaved
+  isSaved: initialIsSaved
 }) => {
   const [loading, setLoading] = useState(false);
-  const sharePost = async (sharedById = "") => {
+  const [isSaved, setIsSaved] = useState(initialIsSaved);
+  const sharePost = async (sharedById="") => {
     setLoading(true);
     const formData = {
       userId: postUserId,
@@ -194,7 +195,7 @@ const PostWidget = ({
       }
   
       const data = await response.json();
-      console.log("Success Response:", data);
+      setIsSaved(data.isSaved);
   
       
       toast.success(data.message, {
@@ -206,9 +207,9 @@ const PostWidget = ({
         draggable: true,
       });
       
-      setTimeout(() => {
-        window.location.reload();
-      }, 750); // 0.5 second delay
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 750); // 0.5 second delay
   
     } catch (e) {
       console.error("Failed to save post:", e);
