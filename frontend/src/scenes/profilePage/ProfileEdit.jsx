@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Typography, Box } from "@mui/material";
 import Dropzone from "react-dropzone";
 import { useSelector, useDispatch } from "react-redux";
-import { updateUserPicturePath } from "state/index.js"; 
+import { updateUserPicturePath } from "state/index.js";
+import { toast, ToastContainer } from 'react-toastify';
 
 const ProfileEditPrompt = ({ open, onClose }) => {
   const dispatch = useDispatch();
@@ -24,6 +25,18 @@ const ProfileEditPrompt = ({ open, onClose }) => {
 
   const handleSave = async () => {
     try {
+      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!validEmail.test(profile.email)){
+        toast.error("Invalid email", {
+            position: 'top-center',
+            autoClose: 1500, // Toast duration set to 1 second
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+        });
+        throw new Error('Invalid Email');
+      }
       if (selectedFile) {
         const formData = new FormData();
         formData.append("picture", selectedFile);
@@ -44,7 +57,6 @@ const ProfileEditPrompt = ({ open, onClose }) => {
         profile.picturePath = pictureData.picturePath; // Assuming the backend returns the new picture URL in `picturePath`
         dispatch(updateUserPicturePath({ picturePath: pictureData.picturePath }));
       }
-
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${_id}`, {
         method: "POST",
         headers: { 
@@ -56,9 +68,25 @@ const ProfileEditPrompt = ({ open, onClose }) => {
 
       if (response.ok) {
         console.log('Profile updated');
+        toast.success("Profile updated successfully!", {
+          position: 'top-center',
+          autoClose: 1000, // Toast duration set to 1 second
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         onClose();
       } else {
         console.log('Profile update failed');
+        toast.error("Email address already in use, profile update failed", {
+            position: 'top-center',
+            autoClose: 1500, // Toast duration set to 1 second
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+        });
       }
     } catch (error) {
       console.error("Error saving profile:", error);
