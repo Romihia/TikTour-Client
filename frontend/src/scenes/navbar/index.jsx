@@ -427,7 +427,7 @@ const Navbar = () => {
                 setSearchUsername(event.target.value);
               }}
               />
-            <IconButton onClick={() => { 
+            <IconButton title="Search" onClick={() => { 
                 searchByFreeText(searchUsername);
                 setShowSearchingFiltersHistory(false);
                 setShowSearchAttributes(false);
@@ -436,7 +436,7 @@ const Navbar = () => {
               }}>
               <Search />
             </IconButton>
-            <IconButton onClick={() => {
+            <IconButton title="Search user/post" onClick={() => {
                 setSearchContent([]);
                 setShowSearchAttributes(!showSearchAttributes);
                 setShowSearchedUsers(false);
@@ -445,7 +445,7 @@ const Navbar = () => {
                 }}>
               <FilterList />
             </IconButton>
-            <IconButton onClick={() => {
+            <IconButton title="Recent Searches" onClick={() => {
                 getSearchingFiltersHistory(user._id);
                 setShowSearchAttributes(false);
                 setShowSearchedUsers(false);
@@ -467,69 +467,68 @@ const Navbar = () => {
             macHeight: '55vh',  // Ensure the list has a minimum height
             height: 'fit-content',
           }}>
-            <h2 style={{display: 'block', width: '100%', textAlign: 'center', color: dark }}>Seaching Filters History</h2>
-            <ul
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 style={{ textAlign: 'center', color: dark }}>Searching Filters History</h2>
+            <IconButton onClick={() => setShowSearchingFiltersHistory(false)} title="Close">
+              <Close />
+            </IconButton>
+          </div>
+
+          <ul
             style={{
               display: 'flex',
               flexDirection: 'column-reverse',
-              width: '100%',  // Adjust the width as needed
+              width: '100%',
               backgroundColor: 'snow',
               border: '1px solid gray',
               borderRadius: '5px',
-              listStyle: 'none',  // Remove bullet points
+              listStyle: 'none',
               margin: '0',
               padding: '10px',
-              maxHeight: '40vh',  // Ensure the list has a minimum height
-              overflowY: 'scroll',  // Enable vertical scrolling
-              overflowX: 'hidden',  // Prevent horizontal scrolling
+              maxHeight: '40vh',
+              overflowY: 'scroll',
+              overflowX: 'hidden',
             }}
           >
-            {searchingFiltersHistory.length > 0 && searchingFiltersHistory.map((data, index) => (
-              <li 
+          {searchingFiltersHistory.length > 0 && searchingFiltersHistory.map((data, index) => (
+            <li 
               key={index} 
               style={{
-                position: 'relative',  // Make the `li` element a relative container
+                position: 'relative',
                 backgroundColor: 'lightpink',
                 border: '1px solid black',
                 borderRadius: '5px',
                 margin: '0.5rem 0',
                 padding: '0.5rem',
                 cursor: 'pointer',
-                height: 'fit-content',
-                wordWrap: 'break-word',  // Ensure long text wraps within the container
+                wordWrap: 'break-word',
               }}
               onClick={async () => {
                 let success;
                 const data = searchingFiltersHistory[index];
-                console.log("\n\n\nData: " + JSON.stringify(data));
                 setSearchContent(data);
-                console.log("\n\nsearchType: ", data.searchType);
-            
+
                 if (data.searchType === "users")
                   success = await searchUsersByAttributes(data);
                 else if (data.searchType === "posts")
                   success = await searchPostsByAttributes(data);
-                console.log("success: ", success);
+
                 if (!success) return;
+
                 setShowSearchingFiltersHistory(false);
                 setShowSearchedUsers(true);
               }}
             >
-              <div style={{
-                position: 'absolute',  // Position the button absolutely within the `li`
-                top: '0.5rem',  // Adjust as needed
-                right: '0.5rem',  // Adjust as needed
-              }}>
+              
+              <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem' }}>
                 <IconButton onClick={(e) => {
-                  e.stopPropagation();  // Prevent click event from triggering the `li` onClick
+                  e.stopPropagation();
                   removeFilterFromHistory(index);
-                  window.location.reload();
-
                 }}>
                   <DeleteOutline />
                 </IconButton>
               </div>
-              <div style={{ marginTop: '2rem' }}>  {/* Added marginTop to prevent overlap with the delete button */}
+              <div style={{ marginTop: '2rem' }}>
                 {Object.entries(data).map(([key, value]) => (
                   <div key={key} style={{ marginBottom: '0.25rem' }}>
                     <strong>{key}:</strong> {String(value)}
@@ -537,12 +536,9 @@ const Navbar = () => {
                 ))}
               </div>
             </li>
-            
-            ))}
-
-          </ul>
-        </div>
-
+          ))}
+        </ul>
+      </div>
 
           
           <ul
@@ -561,6 +557,15 @@ const Navbar = () => {
               overflowX: 'hidden',  // Prevent horizontal scrolling
             }}
           >
+            <div style={{ position: 'relative' }}>
+              <IconButton 
+                style={{ position: 'absolute', top: '0.5rem', right: '0.5rem' }} 
+                onClick={() => setShowSearchedUsers(false)}
+                title="Close"
+              >
+                <Close />
+              </IconButton>
+            </div>
             { reloader &&
               searchContent?.length > 0 && searchContent.map((data, index) => {
               console.log(`data[${index}]`, data);
@@ -574,19 +579,31 @@ const Navbar = () => {
             })}
           </ul>
 
-            { showSearchAttributes && 
+          { showSearchAttributes && 
             <div style={{
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
               flexDirection: 'column',
+              position: 'relative', // Add this to position the close button
             }}>
-             <SearchAttributesDialog 
+              {/* Close Button */}
+              <IconButton 
+                style={{ position: 'absolute', top: '0.5rem', right: '0.5rem' }} 
+                onClick={() => setShowSearchAttributes(false)}
+                title="Close"
+              >
+                <Close />
+              </IconButton>
+              
+              {/* Search Attributes Dialog */}
+              <SearchAttributesDialog 
                 chosenAttributes={chosenAttributes} 
                 setChosenAttributes={setChosenAttributes}
-                advancedSearchOnClick={advancedSearchOnClick} />
+                advancedSearchOnClick={advancedSearchOnClick} 
+              />
             </div>
-            }
+          }
             
           </FlexBetween>
         )}
@@ -595,7 +612,7 @@ const Navbar = () => {
       {/* DESKTOP NAV */}
       {isNonMobileScreens ? (
         <FlexBetween gap="2rem">
-          <IconButton onClick={() => dispatch(setMode())}>
+          <IconButton title="DarkMode/LightMode" onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
               <DarkMode sx={{ fontSize: "25px" }} />
             ) : (
@@ -603,8 +620,10 @@ const Navbar = () => {
             )}
           </IconButton>
           {/* <Message sx={{ fontSize: "25px" }} /> */}
-          <Notifications userId={user._id}/>
-          <IconButton onClick={() => navigate("/about")}>
+          <IconButton title="Notifications">
+            <Notifications userId={user._id} />
+          </IconButton>
+          <IconButton title="About" onClick={() => navigate("/about")}>
           <Help sx={{ fontSize: "25px" }} />
           </IconButton>
           <FormControl variant="standard" value={fullName !== " " ? (fullName):(user.username)}>
