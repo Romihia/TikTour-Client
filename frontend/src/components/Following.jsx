@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { setFollowing } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // MUI icon
 
 const Following = ({ userId, username,name, subtitle, userPicturePath ,showIcons}) => {
   const dispatch = useDispatch();
@@ -77,6 +78,7 @@ const Following = ({ userId, username,name, subtitle, userPicturePath ,showIcons
             }}
           >
             {name === " " ? username : name}
+            {(username==="TikTour"||name==="TikTour")&&(  <CheckCircleIcon sx={{ color: 'blue', ml: 1 }} /> )}
           </Typography>
           <Typography color={medium} fontSize="0.75rem">
             {subtitle}
