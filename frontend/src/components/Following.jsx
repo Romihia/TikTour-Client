@@ -6,7 +6,7 @@ import { setFollowing } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const Following = ({ userId, name, subtitle, userPicturePath ,showIcons}) => {
+const Following = ({ userId, username,name, subtitle, userPicturePath ,showIcons}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
@@ -76,7 +76,7 @@ const Following = ({ userId, name, subtitle, userPicturePath ,showIcons}) => {
               },
             }}
           >
-            {name}
+            {name === " " ? username : name}
           </Typography>
           <Typography color={medium} fontSize="0.75rem">
             {subtitle}

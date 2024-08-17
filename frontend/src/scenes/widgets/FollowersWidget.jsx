@@ -43,6 +43,7 @@ const FollowerListWidget = ({ userId , showIcons = true}) => {
             <Followers
               key={user._id}
               userId={user._id}
+              username={user.username}
               name={`${user.firstName} ${user.lastName}`}
               subtitle={user.rank}
               userPicturePath={user.picturePath}
