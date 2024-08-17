@@ -81,10 +81,10 @@ const PostWidget = ({
       draggable: true,
     });
     
-    // // Delay the reload until after the toast has been shown for 0.5 seconds
-    // setTimeout(() => {
-    //   window.location.reload();
-    // }, 750);
+    // Delay the reload until after the toast has been shown for 0.5 seconds
+    setTimeout(() => {
+      window.location.reload();
+    }, 750);
     setLoading(false);
   };
 
