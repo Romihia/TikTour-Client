@@ -41,6 +41,22 @@ const UserWidget = ({ userId, picturePath }) => {
       console.error("Error fetching user data or rank:", error);
     }
   };
+  function getAge(birthDate) {
+      if(!birthDate){
+        return "Age unknown";
+      }
+      const today = new Date();
+      const birth = new Date(birthDate);
+
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDifference = today.getMonth() - birth.getMonth();
+      const dayDifference = today.getDate() - birth.getDate();
+
+      if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+          age--;
+      }
+      return age;
+}
 
   useEffect(() => {
     fetchUserData();
@@ -107,6 +123,12 @@ const UserWidget = ({ userId, picturePath }) => {
 
       {/* THIRD ROW */}
       <Box p="1rem 0">
+        <FlexBetween mb="0.5rem">
+          <Typography color={medium}>Age</Typography>
+          <Typography color={main} fontWeight="500">
+          {getAge(fixedBirthdayDate)}
+          </Typography>
+        </FlexBetween>
         <FlexBetween mb="0.5rem">
           <Typography color={medium}>Birthday Date</Typography>
           <Typography color={main} fontWeight="500">
