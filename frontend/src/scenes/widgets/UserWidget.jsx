@@ -74,8 +74,7 @@ const UserWidget = ({ userId, picturePath }) => {
     dateOfBirth,
     picturePath: userPicturePath, // Ensure you fetch the picturePath from the backend as well
   } = user;
-
-  const fixedBirthdayDate = dateOfBirth === null ? "No birthday given" : dateOfBirth.slice(0,10);
+  const fixedBirthdayDate = dateOfBirth === null ? "No birthday given" : dateOfBirth?.slice(0,10);
 
   return (
     <WidgetWrapper>
