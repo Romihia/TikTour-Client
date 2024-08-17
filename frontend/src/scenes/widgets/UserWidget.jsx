@@ -9,6 +9,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // MUI icon
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
@@ -41,7 +42,23 @@ const UserWidget = ({ userId, picturePath }) => {
       console.error("Error fetching user data or rank:", error);
     }
   };
+  function getAge(birthDate) {
+    if(!birthDate){
+      return "Age unknown";
+    }
+    birthDate=birthDate.slice(0,10);
+    const today = new Date();
+    const birth = new Date(birthDate);
 
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDifference = today.getMonth() - birth.getMonth();
+    const dayDifference = today.getDate() - birth.getDate();
+
+    if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+        age--;
+    }
+    return age;
+}
   useEffect(() => {
     fetchUserData();
   }, [userId, token]);
@@ -84,6 +101,7 @@ const UserWidget = ({ userId, picturePath }) => {
               }}
             >
               {`${firstName} ${lastName}` === " " ? (username):(`${firstName} ${lastName}`)}
+              {username==="TikTour"&&(  <CheckCircleIcon sx={{ color: 'blue', ml: 1 }} /> )}
             </Typography>
           </Box>
         </FlexBetween>
@@ -95,7 +113,7 @@ const UserWidget = ({ userId, picturePath }) => {
       <Box p="1rem 0">
         <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
           <LocationOnOutlined fontSize="large" sx={{ color: main }} />
-          <Typography color={medium}>{location==="" ?("You don't add location"):(location)}</Typography>
+          <Typography color={medium}>{location==="" ?("No location given."):(location)}</Typography>
         </Box>
         <Box display="flex" alignItems="center" gap="1rem">
           <StarOutlined  fontSize="large" sx={{ color: main }} />
@@ -107,6 +125,12 @@ const UserWidget = ({ userId, picturePath }) => {
 
       {/* THIRD ROW */}
       <Box p="1rem 0">
+      <FlexBetween mb="0.5rem">
+          <Typography color={medium}>Age</Typography>
+          <Typography color={main} fontWeight="500">
+          {getAge(dateOfBirth)}
+          </Typography>
+        </FlexBetween>
         <FlexBetween mb="0.5rem">
           <Typography color={medium}>Birthday Date</Typography>
           <Typography color={main} fontWeight="500">
