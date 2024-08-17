@@ -9,6 +9,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // MUI icon
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
@@ -100,6 +101,7 @@ const UserWidget = ({ userId, picturePath }) => {
               }}
             >
               {`${firstName} ${lastName}` === " " ? (username):(`${firstName} ${lastName}`)}
+              {username==="TikTour"&&(  <CheckCircleIcon sx={{ color: 'blue', ml: 1 }} /> )}
             </Typography>
           </Box>
         </FlexBetween>
