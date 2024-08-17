@@ -88,9 +88,9 @@ const MyPostWidget = ({ picturePath }) => {
         draggable: true,
       });
       
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 750);
+      setTimeout(() => {
+        window.location.reload();
+      }, 750);
     } catch (error) {
       console.error("Error uploading post:", error);
     }finally {

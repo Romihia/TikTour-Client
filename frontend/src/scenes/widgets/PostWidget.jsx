@@ -535,26 +535,27 @@ const PostWidget = ({
       ) : (// the post 
         <Box>
           
-          <Typography color={main} sx={{ mt: "1rem" }}>
+          <Typography color={main} sx={{ mt: "1rem", whiteSpace: 'pre-wrap' }}>
             {description}
-            <ul style={{
-              listStyleType: "none",
-              display: 'flex',
-              flexDirection: "row",
-              flexWrap: "wrap",
-              padding: '0'
-            }}>
+          </Typography>
+          <ul style={{
+            listStyleType: "none",
+            display: 'flex',
+            flexDirection: "row",
+            flexWrap: "wrap",
+            padding: '0'
+          }}>
             {hashtags.map((hashtag) => {
               return (
-                <li key={hashtag} style={{ margin: '5px'}}>
+                <li key={hashtag} style={{ margin: '5px' }}>
                   <b style={{ color: main }}>
                     #{hashtag}
                   </b>
                 </li>
               );
             })}
-            </ul>
-          </Typography>
+          </ul>
+
 
           
         {/* Use the PostImagesDisplay Component Here */}
