@@ -12,7 +12,7 @@ import { Box, IconButton, Typography, useTheme, InputBase, Button } from "@mui/m
 import FlexBetween from "components/FlexBetween";
 import Following from "components/Following";
 import WidgetWrapper from "components/WidgetWrapper";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
 import HashtagsTextField from "./HashtagsTextField";
@@ -54,7 +54,7 @@ const PostWidget = ({
     };
 
     console.log(formData);
-
+    const textAreaRef = useRef(null);
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts`, {// create posts
       method: "POST",
       headers: { 
@@ -81,10 +81,10 @@ const PostWidget = ({
       draggable: true,
     });
     
-    // // Delay the reload until after the toast has been shown for 0.5 seconds
-    // setTimeout(() => {
-    //   window.location.reload();
-    // }, 750);
+    // Delay the reload until after the toast has been shown for 0.5 seconds
+    setTimeout(() => {
+      window.location.reload();
+    }, 750);
     setLoading(false);
   };
 
@@ -494,11 +494,22 @@ const PostWidget = ({
 
           <div style={styles.editBoxChild}>
             <b>Description: </b>
-          <InputBase
-            placeholder="Edit description..."
-            value={editDescription}
-            onChange={(e) => setEditDescription(e.target.value)}
-            sx={{ width: "100%", backgroundColor: palette.neutral.light, borderRadius: "2rem", padding: "1rem 2rem", marginTop: "0.5rem" }}
+            <textarea
+              placeholder="Edit description..."
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              style={{
+                width: "100%",
+                backgroundColor: palette.neutral.light,
+                borderRadius: "2rem",
+                padding: "1rem 2rem",
+                marginTop: "0.5rem",
+                border: "none",
+                fontSize: "16px",
+                color: palette.text.primary,
+                outline: "none",
+                resize: "none"
+            }}
           />
           </div>
           <div style={styles.editBoxChild}><b>Image:</b>
