@@ -25,7 +25,8 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
   const following = useSelector((state) => state.user.following || []);
-  const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
+  //console.log("following:",following);
+  const [isFollowing, setIsFollowing] = useState(null);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -40,6 +41,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [openProfileEdit, setOpenProfileEdit] = useState(false);
   const { palette } = useTheme();
+
 
 
   const buttonStyle = {
@@ -74,11 +76,6 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       });
       const data = await response.json();
       setUser(data);
-
-      const followingResponse = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/following/${userId}`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -184,6 +181,21 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
 
   useEffect(() => {
     getUser();
+    console.log("+++++++++++++++++++++++");
+    const getIsFollowing = async () => {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/following`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+      const following = data.some((user) => user._id === userId);
+      console.log("data",data,"\n","\n","\n","following:" ,following);
+      setIsFollowing(following);
+    };
+    getIsFollowing();
   }, [userId, loggedInUserId, token]);
 
   if (!user) return null;
