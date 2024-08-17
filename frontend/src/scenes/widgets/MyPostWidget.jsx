@@ -26,8 +26,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import ImageDropzone from "components/ImageDropzone";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
+import LoadingPopup from'components/LoadingPopup';
 
 const MyPostWidget = ({ picturePath }) => {
+  const [loading, setLoading] = useState(false);
   const [hashtagsList, setHashtagsList] = useState([]);
   const [isImage, setIsImage] = useState(false);
   const [location, setLocation] = useState(""); // Location state
@@ -53,6 +55,7 @@ const MyPostWidget = ({ picturePath }) => {
   }, [post]); // This effect runs whenever the post text changes
 
   const handlePost = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(); 
       formData.append("userId", _id);
@@ -85,17 +88,16 @@ const MyPostWidget = ({ picturePath }) => {
         draggable: true,
       });
       
-      setTimeout(() => {
-        window.location.reload();
-      }, 750);
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 750);
     } catch (error) {
       console.error("Error uploading post:", error);
+    }finally {
+      setLoading(false); 
     }
   };
   
-
-
-
   return (
     <WidgetWrapper>
       <FlexBetween gap="1.5rem">
@@ -112,25 +114,24 @@ const MyPostWidget = ({ picturePath }) => {
             Description
           </b>
           <textarea
-  ref={textAreaRef} // Add ref to access the DOM element
-  placeholder="What's on your mind..."
-  onChange={(e) => setPost(e.target.value)}
-  value={post}
-  style={{
-    width: '100%', // Full width of the container
-    backgroundColor: palette.neutral.light,
-    minHeight: '80px',
-    borderRadius: '1rem', // Adjust the border radius
-    padding: '1rem 1.5rem', // Adequate padding for text and scroll
-    marginTop: '0.5rem', // Spacing between the label and the textarea
-    border: 'none', // Removes the default border
-    resize: 'vertical', // Allows the user to resize vertically
-    overflow: 'auto', // Enables scrolling
-    fontFamily: 'inherit', // Ensures consistent font styling with the rest of the UI
-    boxSizing: 'border-box', // Ensures padding is included in the width and height
-  }}
-/>
-
+            ref={textAreaRef} // Add ref to access the DOM element
+            placeholder="What's on your mind..."
+            onChange={(e) => setPost(e.target.value)}
+            value={post}
+            style={{
+              width: '100%', // Full width of the container
+              backgroundColor: palette.neutral.light,
+              minHeight: '80px',
+              borderRadius: '1rem', // Adjust the border radius
+              padding: '1rem 1.5rem', // Adequate padding for text and scroll
+              marginTop: '0.5rem', // Spacing between the label and the textarea
+              border: 'none', // Removes the default border
+              resize: 'vertical', // Allows the user to resize vertically
+              overflow: 'auto', // Enables scrolling
+              fontFamily: 'inherit', // Ensures consistent font styling with the rest of the UI
+              boxSizing: 'border-box', // Ensures padding is included in the width and height
+            }}
+          />
         </FlexBetween>
       </FlexBetween>
 
@@ -239,6 +240,7 @@ const MyPostWidget = ({ picturePath }) => {
         >
           POST
         </Button>
+        <LoadingPopup open={loading} />
       </FlexBetween>
     </WidgetWrapper>
   );

@@ -23,7 +23,7 @@ import DeleteModal from "components/DeleteConfirmation";
 import PostImagesDisplay from "components/PostImagesDisplay";
 import { AddPhotoAlternateOutlined } from "@mui/icons-material";
 import ImageDropzone from "components/ImageDropzone";
-
+import LoadingPopup from'components/LoadingPopup';
 
 import { getPosts, setPosts } from "state";
 
@@ -41,8 +41,9 @@ const PostWidget = ({
   dislikes,
   isSaved
 }) => {
-
+  const [loading, setLoading] = useState(false);
   const sharePost = async (sharedById="") => {
+    setLoading(true);
     const formData = {
       userId: postUserId,
       sharedById: sharedById,
@@ -80,10 +81,11 @@ const PostWidget = ({
       draggable: true,
     });
     
-    // Delay the reload until after the toast has been shown for 0.5 seconds
-    setTimeout(() => {
-      window.location.reload();
-    }, 750);
+    // // Delay the reload until after the toast has been shown for 0.5 seconds
+    // setTimeout(() => {
+    //   window.location.reload();
+    // }, 750);
+    setLoading(false);
   };
 
 
@@ -165,7 +167,7 @@ const PostWidget = ({
   };
   
   const saveUnsavePost = async () => {
-  
+    setLoading(true);
     try {
       const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/save/${loggedInUserId}/${postId}/saveUnsavePost`, {
         method: "GET",
@@ -217,6 +219,8 @@ const PostWidget = ({
         pauseOnHover: true,
         draggable: true,
       });
+    }finally {
+      setLoading(false); 
     }
   };  
   
@@ -231,6 +235,7 @@ const PostWidget = ({
   };
   
   const deletePost = async () => {
+    setLoading(true); 
     const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/posts/${postId}`, {
       method: "DELETE",
       headers: {
@@ -263,10 +268,12 @@ const PostWidget = ({
         draggable: true,
       });
     }
-    handleCloseModal(); 
+    handleCloseModal();
+    setLoading(false);
   };
 
   const editPost = async () => {
+    setLoading(true);
     const formData = new FormData(); // Use FormData to handle file uploads and JSON data together
     formData.append("id", postId);
     formData.append("userId", postUserId);
@@ -346,6 +353,7 @@ const PostWidget = ({
       pauseOnHover: true,
       draggable: true,
     });
+    setLoading(false); 
   };
   
   // const renderImagePreview = () => {
@@ -600,6 +608,7 @@ const PostWidget = ({
         </FlexBetween>
       </Box>
       )}
+      <LoadingPopup open={loading} />
     </WidgetWrapper>
   );
 };
