@@ -12,7 +12,7 @@ import PostsWidget from "scenes/widgets/PostsWidget";
 import UserWidget from "scenes/widgets/UserWidget";
 import TotalLikesWidget from "scenes/widgets/TotalLikesWidget";
 import TopLikerWidget from "scenes/widgets/TopLikerWidget";
-import { setFollowing } from "state";
+import { setFollowers } from "state";
 import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
 import ProfileEdit from 'scenes/profilePage/ProfileEdit';
 import { toast, ToastContainer } from 'react-toastify';
@@ -24,8 +24,7 @@ import DeleteModal from "components/DeleteConfirmation";
 const ProfilePage = ({ showOnlySaved, setShowOnlySaved }) => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
-  const following = useSelector((state) => state.user.following || []);
-  const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
+  const followers = useSelector((state) => state.followers || []);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -41,7 +40,19 @@ const ProfilePage = ({ showOnlySaved, setShowOnlySaved }) => {
   const [openProfileEdit, setOpenProfileEdit] = useState(false);
   const { palette } = useTheme();
 
-
+  const getIsFollowing = async () => {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_BACKEND}/users/${userId}/following`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+      const following = data.some((user) => user === userId);
+      return following;
+    };
+  const [isFollowing, setIsFollowing] = useState(getIsFollowing());
   const buttonStyle = {
     width: '60%',
     margin: '5px',
@@ -100,7 +111,7 @@ const ProfilePage = ({ showOnlySaved, setShowOnlySaved }) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      dispatch(setFollowing({ following: data }));
+      dispatch(setFollowers({ followers: data }));
       setIsFollowing(!isFollowing);
     } catch (error) {
       console.error('Error during toggleFollowing:', error);
@@ -185,6 +196,8 @@ const ProfilePage = ({ showOnlySaved, setShowOnlySaved }) => {
       });
     }
   };
+
+
 
   useEffect(() => {
     getUser();
