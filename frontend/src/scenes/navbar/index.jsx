@@ -427,7 +427,7 @@ const Navbar = () => {
                 setSearchUsername(event.target.value);
               }}
               />
-            <IconButton onClick={() => { 
+            <IconButton title="Search" onClick={() => { 
                 searchByFreeText(searchUsername);
                 setShowSearchingFiltersHistory(false);
                 setShowSearchAttributes(false);
@@ -436,7 +436,7 @@ const Navbar = () => {
               }}>
               <Search />
             </IconButton>
-            <IconButton onClick={() => {
+            <IconButton title="Search user/post" onClick={() => {
                 setSearchContent([]);
                 setShowSearchAttributes(!showSearchAttributes);
                 setShowSearchedUsers(false);
@@ -445,7 +445,7 @@ const Navbar = () => {
                 }}>
               <FilterList />
             </IconButton>
-            <IconButton onClick={() => {
+            <IconButton title="Recent Searches" onClick={() => {
                 getSearchingFiltersHistory(user._id);
                 setShowSearchAttributes(false);
                 setShowSearchedUsers(false);
@@ -595,7 +595,7 @@ const Navbar = () => {
       {/* DESKTOP NAV */}
       {isNonMobileScreens ? (
         <FlexBetween gap="2rem">
-          <IconButton onClick={() => dispatch(setMode())}>
+          <IconButton title="DarkMode/LightMode" onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
               <DarkMode sx={{ fontSize: "25px" }} />
             ) : (
@@ -603,8 +603,10 @@ const Navbar = () => {
             )}
           </IconButton>
           {/* <Message sx={{ fontSize: "25px" }} /> */}
-          <Notifications userId={user._id}/>
-          <IconButton onClick={() => navigate("/about")}>
+          <IconButton title="Notifications">
+            <Notifications userId={user._id} />
+          </IconButton>
+          <IconButton title="About" onClick={() => navigate("/about")}>
           <Help sx={{ fontSize: "25px" }} />
           </IconButton>
           <FormControl variant="standard" value={fullName !== " " ? (fullName):(user.username)}>
