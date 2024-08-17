@@ -6,7 +6,7 @@ import { setFollowing,setFollowers } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const Followers = ({ userId, name, subtitle, userPicturePath }) => {
+const Followers = ({ userId,username, name, subtitle, userPicturePath, isDeleted = false ,showIcons}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
@@ -18,9 +18,8 @@ const Followers = ({ userId, name, subtitle, userPicturePath }) => {
   const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
-
   const isFollowing = Array.isArray(following) ? following.find((user) => user._id === userId) : false;
-
+  //console.log(name,"isDeleted : ",isDeleted);
   const toggleFollowing = async () => {
     if (_id === userId){
           console.error('Cant add myself.');
@@ -74,14 +73,14 @@ const Followers = ({ userId, name, subtitle, userPicturePath }) => {
               },
             }}
           >
-            {name}
+            {name === " " ? username : name}
           </Typography>
           <Typography color={medium} fontSize="0.75rem">
             {subtitle}
           </Typography>
         </Box>
       </FlexBetween>
-      {!isFollowing && (
+      {!isFollowing && !isDeleted && showIcons && (
         <IconButton
           onClick={toggleFollowing}
           sx={{ backgroundColor: primaryLight, p: "0.6rem" }}

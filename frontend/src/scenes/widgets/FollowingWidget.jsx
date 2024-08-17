@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFollowing } from "state";
 
-const FollowingListWidget = ({ userId }) => {
+const FollowingListWidget = ({ userId , showIcons = true}) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const token = useSelector((state) => state.token);
@@ -43,9 +43,11 @@ const FollowingListWidget = ({ userId }) => {
             <Following
               key={user._id}
               userId={user._id}
+              username={user.username}
               name={`${user.firstName} ${user.lastName}`}
               subtitle={user.rank}
               userPicturePath={user.picturePath}
+              showIcons = {showIcons}
             />
           ))
         ) : (

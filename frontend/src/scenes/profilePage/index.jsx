@@ -200,7 +200,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />
-          {loggedInUserId !== userId && (
+          {loggedInUserId !== userId && !user.isDeleted && (
             <Button
             variant="contained"
             color={isFollowing ? "secondary" : "primary"}
@@ -274,13 +274,13 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
 
               </div>
             )}
-          {loggedInUserId === userId && (
+          
             <div>
-              <FollowersWidget userId={userId} />
+              <FollowersWidget userId={userId} showIcons={userId===loggedInUserId}/>
               <Box m="2rem 0" />
-              <FollowingWidget userId={userId} />
+              <FollowingWidget userId={userId} showIcons={userId===loggedInUserId}/>
               <Box m="2rem 0" /></div>
-          )}
+          
           <TotalLikesWidget userId={userId} />
           <Box m="2rem 0" />
           <TopLikerWidget userId={userId} />

@@ -10,7 +10,8 @@ const ProfileCompletionPrompt = ({ open, onClose, userCredntionals, token }) => 
     dateOfBirth: userCredntionals.dateOfBirth,
     picturePath: userCredntionals.picturePath || null,
   });
-
+  console.log(userCredntionals.dateOfBirth);
+  const [showdateOfBirth, setShowdateOfBirth] = useState(userCredntionals.dateOfBirth);
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -141,6 +142,18 @@ const ProfileCompletionPrompt = ({ open, onClose, userCredntionals, token }) => 
             fullWidth
             margin="normal"
           />
+          {!showdateOfBirth&&(
+          <TextField
+            label="Date of Birth"  
+            type="date"
+            name="dateOfBirth"
+            value={profile.dateOfBirth}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+            margin="normal"
+          />
+          )}
         </Box>
       </DialogContent>
       {message && (
