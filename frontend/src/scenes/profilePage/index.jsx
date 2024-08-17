@@ -25,6 +25,7 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
   const followers = useSelector((state) => state.followers || []);
+  const [isFollowing, setIsFollowing] = useState(null);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -42,17 +43,17 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
 
   const getIsFollowing = async () => {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_BACKEND}/users/${userId}/following`,
+        `${process.env.REACT_APP_URL_BACKEND}/users/${loggedInUserId}/following`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       const data = await response.json();
-      const following = data.some((user) => user === userId);
+      const following = data.some((user) => user._id === userId);
       return following;
     };
-  const [isFollowing, setIsFollowing] = useState(getIsFollowing());
+
   const buttonStyle = {
     width: '60%',
     margin: '5px',
@@ -201,6 +202,11 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
 
   useEffect(() => {
     getUser();
+    const fetchFollowingStatus = async () => {
+        const followingStatus = await getIsFollowing();
+        setIsFollowing(followingStatus);
+    };
+    fetchFollowingStatus();
   }, [userId, loggedInUserId, token]);
 
   if (!user) return null;
