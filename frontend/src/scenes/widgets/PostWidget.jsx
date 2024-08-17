@@ -163,6 +163,9 @@ const PostWidget = ({
       },
       body: JSON.stringify({ userId: loggedInUserId }),
     });
+    if (isSaved) {
+      await saveUnsavePost();
+    }
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
   };
