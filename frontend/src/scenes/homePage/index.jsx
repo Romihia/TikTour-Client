@@ -31,7 +31,7 @@ const HomePage = () => {
           <MyPostWidget picturePath={picturePath} />
           <PostsWidget userId={_id} />
         </Box>
-        {isNonMobileScreens && (
+        {isNonMobileScreens && _id !== "66c0b6345a1509f6c87f8b46" && (
           <Box flexBasis="26%">
             <Box m="2rem 0" />
             <FollowersWidget userId={_id} /> {/* Display Followers */}

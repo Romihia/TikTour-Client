@@ -21,7 +21,7 @@ import { setLogout } from "state";
 import DeleteModal from "components/DeleteConfirmation";
 
 
-const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
+const ProfilePage = ({ showOnlySaved, setShowOnlySaved }) => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
   const following = useSelector((state) => state.user.following || []);
@@ -280,33 +280,35 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
             )}
           
             <div>
-              <FollowersWidget userId={userId} showIcons={userId===loggedInUserId}/>
-              <Box m="2rem 0" />
-              <FollowingWidget userId={userId} showIcons={userId===loggedInUserId}/>
-              <Box m="2rem 0" /></div>
-          
-          <TotalLikesWidget userId={userId} />
-          <Box m="2rem 0" />
-          <TopLikerWidget userId={userId} />
+              {/* Conditionally load the widgets */}
+              {userId !== "66c0b6345a1509f6c87f8b46" && (
+                <>
+                  <FollowersWidget userId={userId} />
+                  <Box m="2rem 0" />
+                  <FollowingWidget userId={userId} />
+                </>
+              )}
+            </div>
         </Box>
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          {/* Display MyPostWidget only if the logged-in user is viewing their own profile */}
-          {loggedInUserId === userId && (
-            <>
-              <MyPostWidget picturePath={user.picturePath} />
-              <Box m="2rem 0" />
-            </>
-          )}
-          <PostsWidget userId={userId} isProfile={true} onlySaved={showOnlySaved}/>
+          {loggedInUserId === userId && !showOnlySaved && <MyPostWidget picturePath={user.picturePath} />}
+          <PostsWidget userId={userId} showOnlySaved={showOnlySaved} isProfile />
+        </Box>
+        <Box flexBasis="26%">
+          <Box>
+            <TopLikerWidget userId={userId} />
+            <Box m="2rem 0" />
+            <TotalLikesWidget userId={userId} />
+          </Box>
         </Box>
       </Box>
-      <ChangePasswordDialog
-        open={openPasswordDialog}
+      <ChangePasswordDialog 
+        open={openPasswordDialog} 
         onClose={() => setOpenPasswordDialog(false)}
-        onChangePassword={passwordChange}
+        onSubmit={passwordChange}
         oldPassword={oldPassword}
         setOldPassword={setOldPassword}
         newPassword={newPassword}
@@ -314,12 +316,11 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
         confirmNewPassword={confirmNewPassword}
         setConfirmNewPassword={setConfirmNewPassword}
       />
-      {openProfileEdit && (
-        <ProfileEdit
-          open={openProfileEdit}
-          onClose={() => closeEditAccount()}
-        />
-      )}
+      <ProfileEdit
+        open={openProfileEdit}
+        onClose={closeEditAccount}
+      />
+      <ToastContainer/>
     </Box>
   );
 };

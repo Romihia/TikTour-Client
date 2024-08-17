@@ -111,7 +111,7 @@ const UserWidget = ({ userId, picturePath }) => {
       <Box p="1rem 0">
         <Box display="flex" alignItems="center" gap="1rem" mb="0.5rem">
           <LocationOnOutlined fontSize="large" sx={{ color: main }} />
-          <Typography color={medium}>{location==="" ?("You don't add location"):(location)}</Typography>
+          <Typography color={medium}>{location==="" ?("No location given."):(location)}</Typography>
         </Box>
         <Box display="flex" alignItems="center" gap="1rem">
           <StarOutlined  fontSize="large" sx={{ color: main }} />
