@@ -12,7 +12,7 @@ import PostsWidget from "scenes/widgets/PostsWidget";
 import UserWidget from "scenes/widgets/UserWidget";
 import TotalLikesWidget from "scenes/widgets/TotalLikesWidget";
 import TopLikerWidget from "scenes/widgets/TopLikerWidget";
-import { setFollowing } from "state";
+import { setFollowers } from "state";
 import ChangePasswordDialog from 'scenes/profilePage/ChangePassword';
 import ProfileEdit from 'scenes/profilePage/ProfileEdit';
 import { toast, ToastContainer } from 'react-toastify';
@@ -24,8 +24,7 @@ import DeleteModal from "components/DeleteConfirmation";
 const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
   const [user, setUser] = useState(null);
   const { userId } = useParams();
-  const following = useSelector((state) => state.user.following || []);
-  //console.log("following:",following);
+  const followers = useSelector((state) => state.followers || []);
   const [isFollowing, setIsFollowing] = useState(null);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -97,7 +96,11 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      dispatch(setFollowing({ following: data }));
+      if(loggedInUserId===userId){
+        dispatch(setFollowers({ followers: data }));
+      }else{
+        window.location.reload();
+      }
       setIsFollowing(!isFollowing);
     } catch (error) {
       console.error('Error during toggleFollowing:', error);
