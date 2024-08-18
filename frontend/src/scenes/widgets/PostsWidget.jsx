@@ -44,7 +44,18 @@ const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
     const data = await response.json();
     dispatch(setPosts({ posts: data }));
   };
-
+  const getUser = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_URL_BACKEND}/users/${userId}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setUser(data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   const getUserPosts = async () => {
     const response = await fetch(
@@ -58,7 +69,7 @@ const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
     console.log("Posts: " + data);
     dispatch(setPosts({ posts: data }));
   };
-
+  const [user, setUser] = useState("");
   const initializeSavedPosts = async () => {
     const response = await fetch(
       `${process.env.REACT_APP_URL_BACKEND}/save/${loggedInUserId}/getSavedPosts`,
@@ -79,6 +90,7 @@ const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
     }
     else if (isProfile) {
       getUserPosts();
+      getUser();
     } else {
       getUserAndFollowingPosts();
     }
@@ -105,25 +117,29 @@ const PostsWidget = ({ userId, isProfile = false, onlySaved=false }) => {
           // Check if the post is saved by checking if the post ID exists in savedPosts
           const isSaved = savedPosts.some(savedPost => savedPost._id === _id);
   
-          return (
-            <PostWidget
-              key={_id}
-              postId={_id}
-              postUserId={userId}
-              sharedById={sharedById}
-              name={userName}
-              description={description}
-              location={location}
-              picturePath={picturePath}
-              userPicturePath={userPicturePath}
-              hashtags={hashtags}
-              likes={likes}
-              dislikes={dislikes}
-              onLike={() => handleLikePost(_id)}
-              onDislike={() => handleDislikePost(_id)}
-              isSaved={isSaved}
-            />
-          );
+          
+          if (!isProfile||(sharedById==="" || sharedById===user._id)) {
+            return (
+              <PostWidget
+                key={_id}
+                postId={_id}
+                postUserId={userId}
+                sharedById={sharedById}
+                name={userName}
+                description={description}
+                location={location}
+                picturePath={picturePath}
+                userPicturePath={userPicturePath}
+                hashtags={hashtags}
+                likes={likes}
+                dislikes={dislikes}
+                onLike={() => handleLikePost(_id)}
+                onDislike={() => handleDislikePost(_id)}
+                isSaved={isSaved}
+              />
+            );
+          }
+          return null; // Return null when the condition is not met
         })}
       </ul>
     </div>
