@@ -289,13 +289,13 @@ const ProfilePage = ({showOnlySaved, setShowOnlySaved}) => {
 
               </div>
             )}
-          
+          {user._id!=="66c0f78bd42d8e672a238f35"&&(
             <div>
               <FollowersWidget userId={userId} showIcons={userId===loggedInUserId}/>
               <Box m="2rem 0" />
               <FollowingWidget userId={userId} showIcons={userId===loggedInUserId}/>
               <Box m="2rem 0" /></div>
-          
+          )}
           <TotalLikesWidget userId={userId} />
           <Box m="2rem 0" />
           <TopLikerWidget userId={userId} />

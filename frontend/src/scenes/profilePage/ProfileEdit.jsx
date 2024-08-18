@@ -70,12 +70,15 @@ const ProfileEditPrompt = ({ open, onClose }) => {
         console.log('Profile updated');
         toast.success("Profile updated successfully!", {
           position: 'top-center',
-          autoClose: 1000, // Toast duration set to 1 second
+          autoClose: 700, // Toast duration set to 1 second
           hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 750);
         onClose();
       } else {
         console.log('Profile update failed');
