@@ -29,7 +29,7 @@ const ProfileEditPrompt = ({ open, onClose }) => {
       if (!validEmail.test(profile.email)){
         toast.error("Invalid email", {
             position: 'top-center',
-            autoClose: 1500, // Toast duration set to 1 second
+            autoClose: 5000, // Toast duration set to 1 second
             hideProgressBar: true,
             closeOnClick: true,
             pauseOnHover: true,
